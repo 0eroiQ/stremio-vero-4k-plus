@@ -19,23 +19,37 @@ content rows. A conventional Linux desktop window is not acceptable.
 5. **Vero Settings** — a small D-pad interface for network, Bluetooth, remote,
    display, audio, updates, diagnostics, restart, and shutdown.
 
-## Open decision: TV runtime
+## Decision: TV runtime
 
 The official open-source Linux shell is a desktop client. The reference TV
-interface is delivered by Stremio's Android TV application. The project will
-not imitate the screenshot with hard-coded data and will not claim that the
-desktop shell is the TV client.
+interface is delivered by Stremio's native Android TV application. The project
+will not imitate the screenshot with hard-coded data and will not claim that
+the desktop shell is the TV client.
 
-The image build remains blocked until one of these routes is validated:
+The selected technical direction is a minimal Vero-specific Android TV/AOSP
+runtime. On first setup it will download the unmodified ARMv7 APK from the
+official Stremio download host, verify a reviewed SHA-256 value, and install it
+as a normal data application. The image will not bundle or re-sign the APK.
 
-- a permitted official Android TV application/runtime route for this target;
-- an upstream-supported Stremio TV web/runtime route; or
-- explicit upstream permission and a maintainable integration contract.
+This decision gives the requested TV UI, but it introduces a hard platform
+gate: Vero 4K+ has no official Android image. Its Android board definition,
+graphics composer, codec HAL, audio, CEC, input, networking, SELinux policy,
+and update path must be built and validated for this exact hardware.
 
 ## Playback gate
 
-The presence of an Amlogic video driver is not proof that `libmpv` or an
-Android player can use it. Hardware decode, zero-copy presentation, HDR
+The presence of an Amlogic video driver is not proof that Android MediaCodec
+or Stremio's bundled players can use it. Hardware decode, zero-copy presentation, HDR
 metadata, refresh-rate switching, and HDMI passthrough are separate target
 tests.
 
+## Rejected as the primary product
+
+- **Stremio Linux shell:** real Stremio, but desktop GTK/WebKit UI rather than
+  the requested television application.
+- **Styled screenshot clone:** would repeat the earlier hard-coded UI problem
+  and would not be the official Stremio application.
+- **Raspberry Pi Stremio OS image:** uses a Pi-specific LineageOS build and
+  cannot be repackaged for the Amlogic Vero hardware.
+- **Stock OSMC removable image:** it is an installer that repartitions internal
+  storage, not a live SD operating system.

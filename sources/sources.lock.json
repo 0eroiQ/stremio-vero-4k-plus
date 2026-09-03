@@ -6,12 +6,64 @@
     "board_family": "vero3",
     "soc_family": "Amlogic S905D"
   },
-  "sources": [],
+  "sources": [
+    {
+      "name": "OSMC distribution recipes",
+      "url": "https://github.com/osmc/osmc.git",
+      "license": "GPL-2.0-only",
+      "revision_type": "git",
+      "revision": "812f491d789991a7a93192575e995d1b66b44590",
+      "use": "reference-and-build-recipe"
+    },
+    {
+      "name": "OSMC Vero 4K and 4K+ Linux kernel",
+      "url": "https://github.com/osmc/vero3-linux.git",
+      "license": "GPL-2.0-family",
+      "revision_type": "git",
+      "revision": "8a1ef693b11196df698b0d6de4b1c2b0a16ecc55",
+      "use": "candidate-kernel-base"
+    },
+    {
+      "name": "OSMC Vero bootloader source",
+      "url": "https://github.com/osmc/vero3-uboot.git",
+      "license": "GPL-2.0-or-later-and-mixed",
+      "revision_type": "git",
+      "revision": "c3641ad50217bcbc24959c45941ed8147b60182f",
+      "use": "reference-only"
+    },
+    {
+      "name": "OSMC Vero 4K+ kernel package 4.9.269-62",
+      "url": "https://apt.osmc.tv/pool/main/v/vero364-image-4.9.269-62-osmc/vero364-image-4.9.269-62-osmc_4.9.269-62-osmc_arm64.deb",
+      "license": "GPL-2.0-family-and-NOASSERTION-modules",
+      "revision_type": "release",
+      "revision": "4.9.269-62-osmc_arm64",
+      "sha256": "f78c3afc7f9f4a6942e0db56d02a582aededb94a7dbfc449ee223a7603389712",
+      "use": "known-good-kernel-inspection"
+    },
+    {
+      "name": "Stremio OS for Raspberry Pi",
+      "url": "https://github.com/Stremio/stremio-os-rpi.git",
+      "license": "NOASSERTION",
+      "revision_type": "git",
+      "revision": "5bc6f7bf6739584d545c45c410ccfaa8e1413c88",
+      "use": "architecture-reference-only"
+    },
+    {
+      "name": "Stremio Android TV ARM APK 1.10.4",
+      "url": "https://dl.strem.io/android/v1.10.4-androidTV/com.stremio.one-1.10.4-31048580-armeabi-v7a.apk",
+      "license": "LicenseRef-Stremio-Official-Binary",
+      "revision_type": "release",
+      "revision": "1.10.4-31048580-armeabi-v7a",
+      "sha256": "e18a5405bb53e12a903ff477457318b8f8d3c8e1995e0a4c3ff5d8893d1ccf0b",
+      "use": "first-run-download-only"
+    }
+  ],
   "unresolved": [
-    "Exact known-good OSMC kernel commit and matching configuration",
+    "Reconcile the official 4.9.269-62 configuration with an eMMC-disabled external DTB",
     "Exact Vero 4K+ device tree, boot image layout, firmware, and userspace ABI",
-    "Permitted source or redistribution path for the official Stremio TV UI",
-    "Hardware-decoded playback path outside Kodi"
+    "Written redistribution and trademark guidance for the official Stremio TV application",
+    "A Vero-specific Android board configuration and userspace hardware abstraction layer",
+    "Hardware-decoded playback through Android MediaCodec on Vero 4K+",
+    "A proven external-root boot that cannot enumerate internal eMMC"
   ]
 }
-

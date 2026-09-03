@@ -50,9 +50,8 @@ def main() -> None:
         if not sources:
             fail("locked source file must contain sources")
 
-    print(f"source lock: PASS ({data['status']}, {len(sources)} locked sources)")
+    print(f"source lock: PASS ({data['status']}, {len(sources)} declared sources)")
 
 
 if __name__ == "__main__":
     main()
-

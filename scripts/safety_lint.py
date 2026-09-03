@@ -9,6 +9,7 @@ import re
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SKIP = {pathlib.Path(__file__).resolve(), ROOT / "docs" / "SAFETY.md"}
+SKIP_DIRS = {".git", ".cache", "build", "downloads", "out", "__pycache__"}
 TEXT_SUFFIXES = {"", ".md", ".py", ".sh", ".json", ".toml", ".yml", ".yaml"}
 FORBIDDEN = {
     "raw block-device path": re.compile(r"/dev/(?:mmcblk|sd[a-z]|disk[0-9]|rdisk[0-9])"),
@@ -21,7 +22,10 @@ FORBIDDEN = {
 def main() -> None:
     failures: list[str] = []
     for path in ROOT.rglob("*"):
-        if not path.is_file() or path.resolve() in SKIP or ".git" in path.parts:
+        relative = path.relative_to(ROOT)
+        if not path.is_file() or path.resolve() in SKIP:
+            continue
+        if any(part in SKIP_DIRS for part in relative.parts):
             continue
         if path.suffix not in TEXT_SUFFIXES and path.name not in {"Makefile"}:
             continue
@@ -44,4 +48,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

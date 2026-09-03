@@ -19,13 +19,15 @@ experience on the OSMC Vero 4K+ hardware.
 
 ## Current stage
 
-Stage 0: upstream provenance and safety scaffolding.
+Stage 0: upstream provenance and safety scaffolding. The public repository and
+CI checks are active; no bootable artifact has been published.
 
 The TV interface in the project reference is the official Stremio Android TV
 experience. The open-source Stremio Linux shell is a desktop client and is not
-being presented as an equivalent. Before an image is produced, this project
-must establish a permitted distribution path for the official TV application
-and an exact, reproducible Vero 4K+ boot/runtime base.
+being presented as an equivalent. The selected direction is a Vero-specific
+Android TV/AOSP runtime that installs an unmodified official Stremio TV APK
+from Stremio's own download server on first run. The APK will not be committed,
+mirrored, modified, or re-signed by this project.
 
 ## Safety boundary
 
@@ -37,9 +39,9 @@ Every build and test gate is documented in [docs/SAFETY.md](docs/SAFETY.md).
 
 | Component | Status |
 | --- | --- |
-| Repository and CI safety checks | In progress |
+| Repository and CI safety checks | Passing |
 | Exact Vero 4K+ upstream source lock | Researching |
-| Stremio TV runtime/distribution path | Researching |
+| Stremio TV runtime/distribution path | Android TV route selected; licensing gate open |
 | Reproducible root filesystem | Not started |
 | Bootable external image | Not built |
 | Physical Vero boot | Not attempted |
@@ -60,5 +62,5 @@ layout are reviewed and locked.
 
 This project depends on work by Stremio and OSMC. It is not affiliated with,
 endorsed by, or supported by either project. No Stremio APK, OSMC binary,
-device firmware, keys, or proprietary blobs are committed here.
-
+device firmware, keys, or proprietary blobs are committed here. “Stremio” and
+“OSMC” remain the property of their respective owners.
