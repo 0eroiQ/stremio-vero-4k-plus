@@ -26,6 +26,9 @@ not as an ordinary software build.
 
 - Build runs in an isolated, pinned environment.
 - Output is a regular file beneath `out/`; no block device is accepted.
+- Every multi-DTB entry disables eMMC while preserving SD and SDIO.
+- The guarded component uses a four-entry initramfs whose PID 1 can only write
+  its console marker and sleep. It specifies no root target.
 - Partition table and every filesystem are enumerated in a machine-readable
   manifest.
 - Root filesystem contains no internal-storage write service or device rule.
@@ -36,6 +39,10 @@ not as an ordinary software build.
 - Exact-model official OSMC recovery media is available and checksum-verified.
 - The recovery procedure is documented separately from the prototype.
 - No physical test begins while the installed Vero system is unhealthy.
+- The deployed bootloader environment is inspected read-only; no recovery,
+  autoscript, toothpick, or automatic update path is used for the first probe.
+- The pre-kernel path must be proven free of internal writes. Kernel and DTB
+  protections do not count as proof for actions that happen before `bootm`.
 
 ## Gate D: external boot
 
@@ -45,4 +52,3 @@ not as an ordinary software build.
 - A failed test stops; it does not trigger an automatic fallback write.
 
 Internal installation is outside the current milestone.
-

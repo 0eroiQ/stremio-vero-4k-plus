@@ -1,4 +1,4 @@
-.PHONY: check safety sources test preflight fetch-inputs inspect-boot safe-dtb image
+.PHONY: check safety sources test preflight fetch-inputs inspect-boot safe-dtb probe-init probe-initramfs boot-probe image
 
 check: safety sources test
 
@@ -29,7 +29,25 @@ safe-dtb:
 	  --name "OSMC Vero 4K+ kernel package 4.9.269-62"
 	@python3 scripts/build_safe_dtb.py \
 	  --kernel-deb .cache/downloads/vero364-image-4.9.269-62-osmc_4.9.269-62-osmc_arm64.deb \
-	  --output out/boot-probe/dtb-external-only.img
+	  --output out/boot-probe/dtb-emmc-disabled.img
+
+probe-init:
+	@python3 scripts/build_probe_init.py \
+	  --source probe/init.S \
+	  --output out/boot-probe/init-storage-blind \
+	  --qemu qemu-aarch64-static
+
+probe-initramfs: probe-init
+	@python3 scripts/build_probe_initramfs.py \
+	  --init out/boot-probe/init-storage-blind \
+	  --output out/boot-probe/initramfs-storage-blind.cpio.gz
+
+boot-probe: safe-dtb probe-initramfs
+	@python3 scripts/build_boot_probe.py \
+	  --kernel-deb .cache/downloads/vero364-image-4.9.269-62-osmc_4.9.269-62-osmc_arm64.deb \
+	  --safe-dtb out/boot-probe/dtb-emmc-disabled.img \
+	  --initramfs out/boot-probe/initramfs-storage-blind.cpio.gz \
+	  --output out/boot-probe/kernel-safe-probe.img
 
 image:
 	@printf '%s\n' \

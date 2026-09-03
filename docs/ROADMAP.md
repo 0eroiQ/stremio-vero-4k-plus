@@ -3,8 +3,11 @@
 ## Phase 0 — source and recovery proof
 
 - Create the public project and continuous safety checks.
-- Reproduce and inspect an eMMC-disabled Vero 4K+ multi-DTB offline. (Complete;
-  physical boot remains untested.)
+- Reproduce and inspect an all-entry eMMC-disabled Vero multi-DTB offline.
+- Build a deterministic storage-blind initramfs and guarded boot component in
+  CI. Physical boot remains prohibited and untested.
+- Audit the exact deployed removable-boot route and prove it cannot write to
+  internal storage before Linux starts.
 - Pin exact upstream Vero sources and document their licenses.
 - Resolve the official Stremio TV runtime and redistribution path.
 - Document exact-model OSMC recovery without running it.

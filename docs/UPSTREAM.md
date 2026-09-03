@@ -25,6 +25,23 @@ This record separates verified upstream behavior from project assumptions.
 - The official removable image is destructive installation media, not a live
   SD system.
 
+## Verified boot hazards
+
+- The pinned official kernel package has `CONFIG_CMDLINE_EXTEND=y` and a
+  compiled internal-root argument. The kernel source appends that text after
+  incoming boot arguments, so a direct external `root=` argument would not be
+  the final root selection.
+- A present initramfs `/init` is executed before the audited kernel prepares a
+  root namespace. The offline probe uses that route and never returns from its
+  storage-blind PID 1.
+- The pinned readable U-Boot recovery source loads a specifically named
+  recovery component and then may clear 4096 bytes of internal `instaboot`
+  before starting Linux.
+- OSMC published a 2024 binary-only bootloader update whose commit message says
+  it fixes that toothpick/`instaboot` problem. The exact currently deployed
+  removable-media path cannot be matched to readable source, so no automatic
+  boot or recovery-media test is authorized.
+
 ## Still unproven
 
 - A stable Android boot on the exact Vero 4K+ board.
@@ -33,4 +50,5 @@ This record separates verified upstream behavior from project assumptions.
 - HDR metadata, refresh-rate switching, HDMI passthrough, CEC, RF remote,
   Wi-Fi, and Bluetooth in the new runtime.
 - An external-root boot path that leaves internal storage unreachable.
-
+- A read-only audit of the exact deployed bootloader environment and a
+  pre-kernel path proven not to write internal storage.

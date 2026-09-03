@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create and verify a Vero multi-DTB in which the internal eMMC is disabled."""
+"""Create and verify a Vero multi-DTB with eMMC disabled in every entry."""
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ import struct
 import subprocess
 import tarfile
 import tempfile
+from collections.abc import Callable
 
 
 AR_MAGIC = b"!<arch>\n"
@@ -28,6 +29,9 @@ PAGE_SIZE = 2048
 ENTRY_SIZE = 56
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT_ROOT = (ROOT / "out").resolve()
+EMMC_STATUS = ("/emmc@d0074000", "status")
+SD_STATUS = ("/sd@d0072000", "status")
+SDIO_STATUS = ("/sdio@d0070000", "status")
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -256,6 +260,22 @@ def set_fdt_status(fdtput: str, source: pathlib.Path, node: str, status: str) ->
         raise RuntimeError(f"fdtput failed for {node}: {result.stderr.strip()}")
 
 
+def assert_storage_statuses(blob: bytes, *, emmc: bytes, context: str) -> None:
+    _nodes, properties = fdt_snapshot(blob)
+    expected = {
+        EMMC_STATUS: emmc,
+        SD_STATUS: b"okay\0",
+        SDIO_STATUS: b"okay\0",
+    }
+    for key, value in expected.items():
+        if properties.get(key) != value:
+            path, name = key
+            expected_text = value.rstrip(b"\0").decode("ascii")
+            raise ValueError(
+                f"{context} {path}/{name} is not {expected_text}"
+            )
+
+
 def assert_only_emmc_changed(original: bytes, patched: bytes) -> None:
     original_nodes, original_properties = fdt_snapshot(original)
     patched_nodes, patched_properties = fdt_snapshot(patched)
@@ -268,14 +288,86 @@ def assert_only_emmc_changed(original: bytes, patched: bytes) -> None:
         for key in original_properties
         if original_properties[key] != patched_properties[key]
     }
-    expected = {("/emmc@d0074000", "status")}
+    expected = {EMMC_STATUS}
     if differences != expected:
         raise ValueError(f"unexpected device-tree property changes: {sorted(differences)}")
-    emmc_status = ("/emmc@d0074000", "status")
-    if original_properties[emmc_status] != b"okay\0":
-        raise ValueError("official eMMC status was not okay")
-    if patched_properties[emmc_status] != b"disabled\0":
-        raise ValueError("patched eMMC status is not disabled")
+    assert_storage_statuses(original, emmc=b"okay\0", context="official")
+    assert_storage_statuses(patched, emmc=b"disabled\0", context="patched")
+
+
+def entry_identity(entry: dict[str, object]) -> tuple[str, str, str]:
+    return (
+        str(entry["chipset"]),
+        str(entry["platform"]),
+        str(entry["revision"]),
+    )
+
+
+def assert_all_entries_safely_patched(
+    official_entries: list[dict[str, object]],
+    patched_entries: list[dict[str, object]],
+) -> None:
+    if not official_entries:
+        raise ValueError("multi-DTB has no device-tree entries")
+    if len(official_entries) != len(patched_entries):
+        raise ValueError("patched multi-DTB entry count changed")
+    if [entry_identity(entry) for entry in official_entries] != [
+        entry_identity(entry) for entry in patched_entries
+    ]:
+        raise ValueError("patched multi-DTB index changed")
+    for index, (official, patched) in enumerate(
+        zip(official_entries, patched_entries, strict=True)
+    ):
+        try:
+            assert_only_emmc_changed(bytes(official["dtb"]), bytes(patched["dtb"]))
+        except (TypeError, ValueError) as error:
+            identity = "/".join(entry_identity(official))
+            raise ValueError(
+                f"unsafe multi-DTB entry {index} ({identity}): {error}"
+            ) from error
+
+
+def patch_all_entries(
+    official_entries: list[dict[str, object]],
+    patcher: Callable[[int, dict[str, object]], bytes],
+) -> list[dict[str, object]]:
+    patched_entries: list[dict[str, object]] = []
+    for index, official in enumerate(official_entries):
+        patched = dict(official)
+        patched["dtb"] = patcher(index, official)
+        patched_entries.append(patched)
+    assert_all_entries_safely_patched(official_entries, patched_entries)
+    return patched_entries
+
+
+def patch_entry_storage(
+    fdtget: str,
+    fdtput: str,
+    work: pathlib.Path,
+    index: int,
+    entry: dict[str, object],
+) -> bytes:
+    identity = "/".join(entry_identity(entry))
+    original_dtb = work / f"entry-{index}-official.dtb"
+    safe_dtb = work / f"entry-{index}-external-only.dtb"
+    original_dtb.write_bytes(bytes(entry["dtb"]))
+    shutil.copyfile(original_dtb, safe_dtb)
+    if fdt_status(fdtget, original_dtb, "emmc@d0074000") != "okay":
+        raise ValueError(f"official {identity} eMMC node is not enabled")
+    if fdt_status(fdtget, original_dtb, "sd@d0072000") != "okay":
+        raise ValueError(f"official {identity} SD node is not enabled")
+    if fdt_status(fdtget, original_dtb, "sdio@d0070000") != "okay":
+        raise ValueError(f"official {identity} SDIO node is not enabled")
+    set_fdt_status(fdtput, safe_dtb, "emmc@d0074000", "disabled")
+    if fdt_status(fdtget, safe_dtb, "emmc@d0074000") != "disabled":
+        raise ValueError(f"safe {identity} eMMC node was not disabled")
+    if fdt_status(fdtget, safe_dtb, "sd@d0072000") != "okay":
+        raise ValueError(f"safe {identity} SD node was changed")
+    if fdt_status(fdtget, safe_dtb, "sdio@d0070000") != "okay":
+        raise ValueError(f"safe {identity} SDIO node was changed")
+    patched_dtb = safe_dtb.read_bytes()
+    assert_only_emmc_changed(bytes(entry["dtb"]), patched_dtb)
+    return patched_dtb
 
 
 def safe_output(path: pathlib.Path) -> pathlib.Path:
@@ -302,41 +394,23 @@ def main() -> None:
     deb = args.kernel_deb.read_bytes()
     data_tar = ar_member(deb, "data.tar.xz")
     original = tar_member_xz(data_tar, "boot/dtb-4.9.269-62-osmc.img")
-    entries = parse_multidtb(original)
-    matches = [entry for entry in entries if entry["platform"] == "p231"]
+    official_entries = parse_multidtb(original)
+    matches = [entry for entry in official_entries if entry["platform"] == "p231"]
     if len(matches) != 1:
         raise ValueError("expected exactly one Vero 4K+ p231 device tree")
 
-    target_entry = matches[0]
     with tempfile.TemporaryDirectory(prefix="stremio-vero-dtb-") as directory:
         work = pathlib.Path(directory)
-        original_dtb = work / "vero4kplus.dtb"
-        safe_dtb = work / "vero4kplus-external-only.dtb"
-        original_dtb.write_bytes(target_entry["dtb"])
-        shutil.copyfile(original_dtb, safe_dtb)
-        if fdt_status(fdtget, original_dtb, "emmc@d0074000") != "okay":
-            raise ValueError("official Vero 4K+ eMMC node is not enabled")
-        if fdt_status(fdtget, original_dtb, "sd@d0072000") != "okay":
-            raise ValueError("official Vero 4K+ SD node is not enabled")
-        if fdt_status(fdtget, original_dtb, "sdio@d0070000") != "okay":
-            raise ValueError("official Vero 4K+ SDIO node is not enabled")
-        set_fdt_status(fdtput, safe_dtb, "emmc@d0074000", "disabled")
-        if fdt_status(fdtget, safe_dtb, "emmc@d0074000") != "disabled":
-            raise ValueError("safe Vero 4K+ eMMC node was not disabled")
-        if fdt_status(fdtget, safe_dtb, "sd@d0072000") != "okay":
-            raise ValueError("safe Vero 4K+ SD node was changed")
-        if fdt_status(fdtget, safe_dtb, "sdio@d0070000") != "okay":
-            raise ValueError("safe Vero 4K+ SDIO node was changed")
-        patched_dtb = safe_dtb.read_bytes()
-        assert_only_emmc_changed(target_entry["dtb"], patched_dtb)
-        target_entry["dtb"] = patched_dtb
+        entries = patch_all_entries(
+            official_entries,
+            lambda index, entry: patch_entry_storage(
+                fdtget, fdtput, work, index, entry
+            ),
+        )
 
     rebuilt = pack_multidtb(entries)
     reparsed = parse_multidtb(rebuilt)
-    if [(e["chipset"], e["platform"], e["revision"]) for e in reparsed] != [
-        (e["chipset"], e["platform"], e["revision"]) for e in entries
-    ]:
-        raise ValueError("rebuilt multi-DTB index does not match the official input")
+    assert_all_entries_safely_patched(official_entries, reparsed)
 
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(rebuilt)
@@ -351,7 +425,9 @@ def main() -> None:
                 "chipset": entry["chipset"],
                 "platform": entry["platform"],
                 "revision": entry["revision"],
-                "emmc": "disabled" if entry["platform"] == "p231" else "unchanged",
+                "emmc": "disabled",
+                "sd": "okay",
+                "sdio": "okay",
             }
             for entry in entries
         ],
@@ -359,7 +435,7 @@ def main() -> None:
     }
     manifest_path = output.with_suffix(output.suffix + ".manifest.json")
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    print(f"safe Vero 4K+ multi-DTB: PASS ({manifest['sha256']})")
+    print(f"all-entry eMMC-disabled Vero multi-DTB: PASS ({manifest['sha256']})")
     print(f"artifact: {output}")
     print("physical boot status: NOT TESTED")
 

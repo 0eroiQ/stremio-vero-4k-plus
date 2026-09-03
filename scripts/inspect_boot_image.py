@@ -147,7 +147,20 @@ def parse_newc(blob: bytes) -> dict[str, dict[str, object]]:
             raise ValueError(f"unsafe newc path: {name}")
         if name in entries:
             raise ValueError(f"duplicate newc entry: {name}")
-        entries[name] = {"mode": mode, "data": data}
+        entries[name] = {
+            "inode": values[0],
+            "mode": mode,
+            "uid": values[2],
+            "gid": values[3],
+            "links": values[4],
+            "mtime": values[5],
+            "size": file_size,
+            "dev_major": values[7],
+            "dev_minor": values[8],
+            "rdev_major": values[9],
+            "rdev_minor": values[10],
+            "data": data,
+        }
     raise ValueError("newc archive has no trailer")
 
 

@@ -64,6 +64,8 @@
     "Written redistribution and trademark guidance for the official Stremio TV application",
     "A Vero-specific Android board configuration and userspace hardware abstraction layer",
     "Hardware-decoded playback through Android MediaCodec on Vero 4K+",
-    "A proven external-root boot that cannot enumerate internal eMMC"
+    "A proven external-root boot that cannot enumerate internal eMMC",
+    "A readable source-to-binary proof that the deployed removable-boot path performs no pre-kernel internal write",
+    "A pinned cross-toolchain for reproducible ARM64 probe binaries"
   ]
 }
