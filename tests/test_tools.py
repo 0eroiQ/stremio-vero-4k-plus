@@ -187,6 +187,41 @@ class GitSourceCacheTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "untracked file"):
                 self.fetch.verify_clean_checkout(repository)
 
+    def test_no_checkout_clone_is_not_treated_as_a_ready_cache(self) -> None:
+        source = {
+            "name": "fixture",
+            "url": "https://github.com/Stremio/stremio-web.git",
+            "revision": "a" * 40,
+        }
+        calls: list[tuple[str, ...]] = []
+
+        def fake_run(*args: str, cwd: pathlib.Path | None = None) -> str:
+            calls.append(args)
+            if args[:3] == ("git", "clone", "--filter=blob:none"):
+                pathlib.Path(args[-1]).mkdir(parents=True)
+                (pathlib.Path(args[-1]) / ".git").mkdir()
+                return ""
+            if args == ("git", "remote", "get-url", "origin"):
+                return source["url"]
+            if args == ("git", "rev-parse", "HEAD"):
+                return source["revision"]
+            return ""
+
+        with tempfile.TemporaryDirectory() as directory:
+            destination = pathlib.Path(directory) / "stremio-web"
+            original_cache = self.fetch.CACHE
+            original_run = self.fetch.run
+            self.fetch.CACHE = pathlib.Path(directory)
+            self.fetch.run = fake_run
+            try:
+                self.fetch.fetch(source, destination)
+            finally:
+                self.fetch.run = original_run
+                self.fetch.CACHE = original_cache
+
+        self.assertIn(("git", "fetch", "--depth=1", "origin", source["revision"]), calls)
+        self.assertIn(("git", "switch", "--detach", source["revision"]), calls)
+
 
 class StremioServiceRuntimeTests(unittest.TestCase):
     @classmethod

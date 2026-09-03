@@ -80,7 +80,8 @@ def fetch(source: dict[str, str], destination: Path) -> None:
     if not resolved.is_relative_to(CACHE.resolve()):
         raise SystemExit(f"destination must stay beneath {CACHE}")
 
-    if not destination.exists():
+    created = not destination.exists()
+    if created:
         run("git", "clone", "--filter=blob:none", "--no-checkout", source["url"], str(destination))
     if not (destination / ".git").is_dir():
         raise SystemExit(f"destination is not a dedicated Git cache: {destination}")
@@ -89,7 +90,7 @@ def fetch(source: dict[str, str], destination: Path) -> None:
 
     revision = source["revision"]
     actual = run("git", "rev-parse", "HEAD", cwd=destination)
-    if actual == revision:
+    if actual == revision and not created:
         verify_clean_checkout(destination)
         print(f"verified cached Git source: {source['name']} @ {actual}")
         return
