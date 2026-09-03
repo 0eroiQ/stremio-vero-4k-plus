@@ -93,3 +93,34 @@ WASM paths.
 - Kodi autostart override present: no
 
 No Vero, eMMC, SD card or USB drive was accessed by this build.
+
+## 2026-09-03 — disabled EGLFS kiosk compatibility probe
+
+An archive-only display audit examined the final OSMC rootfs and its shipped
+kernel configuration. The Vero stack contains the vendor Mali/EGL/GLES
+libraries, advertises `MALI_FBDEV` and `/dev/fb0`, and has framebuffer and
+Mali400 kernel support. The same kernel explicitly has `CONFIG_DRM` disabled.
+Cog, WPE WebKit, WPEBackend-fdo, Wayland, a compositor and GBM are absent.
+
+Ordinary Cog/WPE/Wayland is therefore rejected as a drop-in kiosk path. The
+next disabled compatibility probe uses Qt WebEngine with EGLFS, which can
+target a single fullscreen EGL surface without a desktop compositor. The
+overlay now carries only its launcher, fullscreen QML view and service file;
+the Qt runtime is not packaged yet.
+
+The kiosk probe is not linked into any boot target and has
+`RefuseManualStart=yes`. Stremio Service also remains disabled, and Kodi's
+normal OSMC autostart remains unchanged.
+
+- final derived rootfs SHA-256:
+  `2d97464c32ed6bb43309cfd2770dc8f731d5882945d40a40a80b0dd8d36179ae`
+- original OSMC entries: 40,574
+- byte-and-metadata-identical original entries: 40,574
+- declared overlay entries: 124
+- Python and safety suite: 48 tests passed
+- Stremio kiosk autostart link present: no
+- Stremio kiosk manual start allowed: no
+- Stremio Service autostart link present: no
+- Kodi autostart override present: no
+
+No Vero, eMMC, SD card or USB drive was accessed by this build.

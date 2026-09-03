@@ -23,7 +23,10 @@ twice with identical content and all offline checks pass.
 - [x] Package a restricted OSMC service unit with private state and cache.
 - Keep the service disabled until port 11470 exposure and the physical Vero
   data-path test are resolved.
-- Select the smallest compatible WPE/WebKit shell for OSMC Bullseye armhf.
+- [x] Audit the pinned Vero display stack and reject ordinary Cog/WPE/Wayland
+  as a drop-in kiosk path.
+- Prepare a disabled Qt WebEngine/EGLFS compatibility probe for OSMC Bullseye
+  armhf without replacing the vendor EGL libraries.
 - Prove fullscreen rendering and RF/CEC D-pad input on a non-Vero test target.
 - Implement the Stremio-to-Kodi playback request and DRM display hand-off.
 - Apply queued settings through Kodi JSON-RPC before playback.

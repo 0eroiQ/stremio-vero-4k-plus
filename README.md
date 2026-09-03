@@ -44,8 +44,8 @@ already provides the proven AMCodec, refresh-rate, HDR and HDMI-audio support.
 
 - Prove the packaged Stremio Service on Vero hardware and decide whether port
   11470 remains available to the home network or is isolated behind a proxy.
-- Select and package a lightweight fullscreen WebKit/WPE shell that can use
-  Vero's display stack and D-pad input.
+- Package and validate the selected, disabled Qt WebEngine/EGLFS compatibility
+  probe against Vero's fbdev EGL stack and D-pad input.
 - Complete the display hand-off: stop the Stremio shell, start hidden Kodi with
   the selected URL, then restore Stremio when playback ends.
 - Connect Vero Settings to ConnMan, BlueZ, CEC and the OSMC updater through

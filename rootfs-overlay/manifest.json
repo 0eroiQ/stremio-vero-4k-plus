@@ -79,6 +79,21 @@
       "source": "rootfs-overlay/stremio-vero-service.service",
       "target": "etc/systemd/system/stremio-vero-service.service",
       "mode": "0644"
+    },
+    {
+      "source": "runtime/kiosk/launcher.py",
+      "target": "usr/lib/stremio-vero/kiosk-launcher.py",
+      "mode": "0755"
+    },
+    {
+      "source": "runtime/kiosk/main.qml",
+      "target": "usr/share/stremio-vero/kiosk/main.qml",
+      "mode": "0644"
+    },
+    {
+      "source": "rootfs-overlay/stremio-vero-kiosk-probe.service",
+      "target": "etc/systemd/system/stremio-vero-kiosk-probe.service",
+      "mode": "0644"
     }
   ],
   "trees": [

@@ -15,8 +15,10 @@ and shell integration.
 
 1. **OSMC base** — unchanged Vero bootloader, kernel, DTB, firmware and Debian
    armhf userspace.
-2. **Stremio kiosk shell** — a fullscreen WebKit/WPE host for the pinned
-   official Stremio Web build, with D-pad navigation and no desktop.
+2. **Stremio kiosk shell** — a fullscreen embedded web host for the pinned
+   official Stremio Web build, with D-pad navigation and no desktop. The base
+   audit rejects ordinary Cog/WPE/Wayland as a drop-in and selects an inactive
+   Qt WebEngine/EGLFS compatibility probe for the Vero fbdev EGL stack.
 3. **Stremio Service** — the official Server JavaScript on a verified ARMv7
    Node.js runtime with matching ARM FFmpeg tools. Its state and cache are
    isolated from the immutable application files. The packaged unit remains

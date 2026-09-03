@@ -1,4 +1,4 @@
-.PHONY: check safety sources test preflight fetch-inputs stremio-web-source stremio-web-build stremio-service-source stremio-service-runtime stremio-service-audit stremio-service-smoke osmc-base-rootfs osmc-rootfs verify-osmc-rootfs inspect-boot safe-dtb probe-init probe-initramfs boot-probe image
+.PHONY: check safety sources test preflight fetch-inputs stremio-web-source stremio-web-build stremio-service-source stremio-service-runtime stremio-service-audit stremio-service-smoke osmc-base-rootfs kiosk-audit osmc-rootfs verify-osmc-rootfs inspect-boot safe-dtb probe-init probe-initramfs boot-probe image
 
 OSMC_IMAGE := .cache/downloads/OSMC_TGT_vero3_20250303.img.gz
 OSMC_ROOTFS := .cache/downloads/OSMC_TGT_vero3_20250303-rootfs.tar.xz
@@ -85,6 +85,11 @@ osmc-base-rootfs: fetch-inputs
 	  --image-gz $(OSMC_IMAGE) \
 	  --output $(OSMC_ROOTFS) \
 	  --expected-sha256 $(OSMC_SHA256)
+
+kiosk-audit: osmc-base-rootfs
+	@python3 scripts/audit_kiosk_base.py \
+	  --rootfs $(OSMC_ROOTFS) \
+	  --output out/kiosk/base-audit.json
 
 osmc-rootfs: osmc-base-rootfs stremio-web-build stremio-service-runtime
 	@python3 scripts/build_osmc_rootfs.py \

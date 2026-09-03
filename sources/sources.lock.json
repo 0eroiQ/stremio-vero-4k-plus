@@ -104,7 +104,7 @@
   ],
   "unresolved": [
     "Complete physical Vero integration for the ARM Stremio Service and media tools",
-    "Select and prove a fullscreen WPE or WebKit kiosk host on OSMC Bullseye armhf",
+    "Pin and prove a fullscreen Qt WebEngine EGLFS kiosk host on OSMC Bullseye armhf",
     "Complete Stremio stream interception and Kodi display hand-off",
     "Connect narrow ConnMan BlueZ CEC and OSMC lifecycle adapters",
     "Review redistribution of a derived full OSMC installer image",
