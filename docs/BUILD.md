@@ -23,6 +23,19 @@ make fetch-inputs
 The fetcher accepts only `https://apt.osmc.tv` and `https://dl.strem.io` and
 refuses an input whose SHA-256 differs from `sources/sources.lock.json`.
 
+Inspect the official Android boot-image container without extracting or
+executing its contents:
+
+```sh
+make inspect-boot
+```
+
+The generated JSON records the boot header and component hashes. It must also
+reject reuse of the original OSMC ramdisk because that ramdisk defaults to an
+internal MMC device, includes filesystem-repair programs, prepares a writable
+root, and exposes a rescue shell. Those are valid OSMC behaviors but violate
+this project's external-only first-boot boundary.
+
 ## External-only device tree
 
 Install `dtc`, `fdtget`, and `fdtput` from the Device Tree Compiler package,

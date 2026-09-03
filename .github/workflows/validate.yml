@@ -20,5 +20,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes device-tree-compiler
+      - name: Inspect and reject the writable OSMC ramdisk
+        run: make inspect-boot
       - name: Rebuild and verify the external-only Vero DTB
         run: make safe-dtb

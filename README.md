@@ -42,6 +42,7 @@ Every build and test gate is documented in [docs/SAFETY.md](docs/SAFETY.md).
 | Component | Status |
 | --- | --- |
 | Repository and CI safety checks | Passing |
+| Official Vero boot-container analysis | Passing; original writable ramdisk rejected |
 | eMMC-disabled Vero 4K+ multi-DTB | Reproducible offline; hardware not tested |
 | Exact Vero 4K+ upstream source lock | Researching |
 | Stremio TV runtime/distribution path | Android TV route selected; licensing gate open |
@@ -68,6 +69,13 @@ make safe-dtb
 The builder reads the checksummed official kernel package, changes only the
 Vero 4K+ eMMC `status` property, verifies that SD and SDIO remain enabled, and
 writes a checksum manifest marked `physical_boot_tested: false`.
+
+Inspect the official Vero Android boot wrapper and confirm that its original
+OSMC ramdisk is unsuitable for this external-only prototype:
+
+```sh
+make inspect-boot
+```
 
 `make image` intentionally refuses to run until the upstream inputs and image
 layout are reviewed and locked.

@@ -52,3 +52,16 @@ or property change.
 This is offline structural evidence only. It does not prove that the factory
 bootloader will select or boot the modified tree, and it is not permission to
 prepare removable media.
+
+## Official boot-image inspection
+
+`make inspect-boot` verifies that the current official Vero kernel package uses
+an Android boot header v1 with 2048-byte pages, a gzip-compressed kernel and
+ramdisk, and the Amlogic multi-DTB as its second component. It records the exact
+addresses, sizes, and hashes without executing or extracting them to the host
+filesystem.
+
+The inspection deliberately rejects the bundled OSMC ramdisk for this project:
+its normal job includes selecting internal MMC by default, filesystem repair,
+a writable root mount, and a rescue shell. A new restricted initramfs is
+therefore a required artifact rather than an optional cleanup.
