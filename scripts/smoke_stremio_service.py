@@ -46,31 +46,59 @@ def smoke(runtime: Path, server: Path, emulator: Path, sysroot: Path) -> dict[st
             "NO_HTTPS_SERVER": "1",
         }
     )
-    command = [str(emulator), "-L", str(sysroot), str(runtime), str(server)]
+    prefix = [str(emulator), "-L", str(sysroot), str(runtime)]
+    version_probe = subprocess.run(
+        [*prefix, "--version"],
+        env=environment,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        timeout=10,
+    )
+    version_output = version_probe.stdout.decode("utf-8", "replace").strip()
+    if version_probe.returncode != 0:
+        raise RuntimeError(
+            f"ARM Node version probe exited with status {version_probe.returncode}: "
+            f"{version_output}"
+        )
+    if version_output != "v18.12.1":
+        raise RuntimeError(f"unexpected ARM Node version: {version_output!r}")
+
+    command = [*prefix, str(server)]
     process = subprocess.Popen(
         command,
         env=environment,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
+    failure: BaseException | None = None
+    status: int | None = None
     try:
         status = wait_for_http(process, 20)
+    except BaseException as error:
+        failure = error
     finally:
-        process.terminate()
+        if process.poll() is None:
+            process.terminate()
         try:
             output = process.communicate(timeout=5)[0]
         except subprocess.TimeoutExpired:
             process.kill()
             output = process.communicate(timeout=5)[0]
+    decoded_output = output.decode("utf-8", "replace")
+    if failure is not None:
+        raise RuntimeError(f"{failure}; service output: {decoded_output[-4000:]}") from failure
+    if status is None:
+        raise RuntimeError("service probe completed without an HTTP status")
 
     report = {
         "armRuntimeExecuted": True,
+        "nodeVersion": version_output,
         "serverPort": 11470,
         "httpStatus": status,
         "ffmpegUsed": False,
         "ffprobeUsed": False,
         "scope": "startup only; no streaming or playback",
-        "logTail": output.decode("utf-8", "replace")[-2000:],
+        "logTail": decoded_output[-2000:],
     }
     print(json.dumps(report, indent=2, sort_keys=True))
     return report
