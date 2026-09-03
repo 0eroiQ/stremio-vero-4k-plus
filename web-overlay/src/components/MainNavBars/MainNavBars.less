@@ -3,6 +3,9 @@
 @import (reference) '~stremio/common/screen-sizes.less';
 
 .main-nav-bars-container {
+    --vertical-nav-bar-size: 4.5rem;
+    --tv-content-left: clamp(0.5rem, 0.8vw, 0.8rem);
+
     position: relative;
     z-index: 0;
     width: calc(100% - var(--safe-area-inset-left) - var(--safe-area-inset-right));

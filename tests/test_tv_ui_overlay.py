@@ -5,6 +5,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 BOARD = ROOT / "web-overlay" / "src" / "routes" / "Board" / "Board.js"
 NAV = ROOT / "web-overlay" / "src" / "components" / "MainNavBars" / "MainNavBars.tsx"
+NAV_STYLES = ROOT / "web-overlay" / "src" / "components" / "MainNavBars" / "MainNavBars.less"
 RAIL = ROOT / "web-overlay" / "src" / "components" / "NavBar" / "VerticalNavBar" / "styles.less"
 RAIL_COMPONENT = ROOT / "web-overlay" / "src" / "components" / "NavBar" / "VerticalNavBar" / "VerticalNavBar.js"
 RAIL_BUTTON = ROOT / "web-overlay" / "src" / "components" / "NavBar" / "VerticalNavBar" / "NavTabButton" / "NavTabButton.js"
@@ -23,6 +24,7 @@ ADDON_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Addons" / "Addon" / "s
 SETTINGS_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Settings" / "Settings.less"
 SETTINGS_MENU = ROOT / "web-overlay" / "src" / "routes" / "Settings" / "Menu" / "Menu.tsx"
 SETTINGS_MENU_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Settings" / "Menu" / "Menu.less"
+SETTINGS_GENERAL = ROOT / "web-overlay" / "src" / "routes" / "Settings" / "General" / "General.tsx"
 SETTINGS_SECTION_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Settings" / "components" / "Section" / "Section.less"
 SETTINGS_OPTION_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Settings" / "components" / "Option" / "Option.less"
 
@@ -49,6 +51,25 @@ class TvUiOverlayTests(unittest.TestCase):
         self.assertIn("id: 'discover'", source)
         self.assertIn("id: 'library'", source)
         self.assertNotIn("HorizontalNavBar", source)
+
+    def test_every_tv_route_starts_close_to_the_icon_rail(self) -> None:
+        nav_styles = NAV_STYLES.read_text(encoding="utf-8")
+        self.assertIn("--vertical-nav-bar-size: 4.5rem", nav_styles)
+        self.assertIn("--tv-content-left: clamp(0.5rem, 0.8vw, 0.8rem)", nav_styles)
+
+        route_styles = [
+            BOARD.with_name("styles.less"),
+            SEARCH_STYLES,
+            DISCOVER.with_name("styles.less"),
+            LIBRARY.with_name("styles.less"),
+            ADDONS_STYLES,
+            META_DETAILS_STYLES,
+            SETTINGS_STYLES,
+        ]
+        for path in route_styles:
+            styles = path.read_text(encoding="utf-8")
+            self.assertIn("var(--tv-content-left)", styles, path)
+            self.assertNotIn("left: 4.25%", styles, path)
 
     def test_tv_rail_expands_only_while_it_has_focus(self) -> None:
         source = RAIL.read_text(encoding="utf-8")
@@ -162,12 +183,14 @@ class TvUiOverlayTests(unittest.TestCase):
 
     def test_settings_use_tv_section_rail_and_focusable_cards(self) -> None:
         route_styles = SETTINGS_STYLES.read_text(encoding="utf-8")
+        general = SETTINGS_GENERAL.read_text(encoding="utf-8")
         menu = SETTINGS_MENU.read_text(encoding="utf-8")
         menu_styles = SETTINGS_MENU_STYLES.read_text(encoding="utf-8")
         section_styles = SETTINGS_SECTION_STYLES.read_text(encoding="utf-8")
         option_styles = SETTINGS_OPTION_STYLES.read_text(encoding="utf-8")
 
         self.assertIn("grid-template-columns: clamp(12.5rem, 17vw, 14rem) minmax(0, 1fr)", route_styles)
+        self.assertIn("padding: 1.35rem 1.5rem 1.35rem var(--tv-content-left)", route_styles)
         self.assertIn("settings-stage", route_styles)
         self.assertIn("activeSection.content", (ROOT / "web-overlay" / "src" / "routes" / "Settings" / "Settings.tsx").read_text(encoding="utf-8"))
         self.assertIn("data-tv-row={'settings-menu'}", menu)
@@ -178,6 +201,10 @@ class TvUiOverlayTests(unittest.TestCase):
         self.assertIn("width: min(68rem, 100%)", section_styles)
         self.assertIn("grid-template-columns: minmax(12rem, 1fr) minmax(13rem, 0.8fr)", option_styles)
         self.assertIn("&:focus-within", option_styles)
+        self.assertIn("<User profile={profile} />", general)
+        self.assertNotIn("openExternal", general)
+        self.assertNotIn("href={'https://", general)
+        self.assertNotIn("SETTINGS_TRAKT", general)
 
 
 if __name__ == "__main__":

@@ -63,7 +63,7 @@ const Settings = () => {
             default:
                 return {
                     title: t('SETTINGS_NAV_GENERAL'),
-                    description: 'Your account, connected services and privacy.',
+                    description: 'Your Stremio account and device information.',
                     content: <><General profile={profile} /><Info streamingServer={streamingServer} /></>,
                 };
         }
