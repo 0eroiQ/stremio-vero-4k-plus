@@ -1,0 +1,197 @@
+// Copyright (C) 2017-2024 Smart code 203358507
+
+@import (reference) '~@stremio/stremio-colors/less/stremio-colors.less';
+
+.board-container {
+    width: 100%;
+    height: calc(100% - var(--safe-area-inset-bottom));
+    overflow: hidden;
+    background: #050509;
+
+    .board-content-container {
+        width: 100%;
+        height: 100%;
+        background: transparent;
+    }
+
+    .tv-board {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #050509;
+    }
+
+    .hero-artwork-layer {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        .hero-artwork {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+        }
+    }
+
+    .hero-shade {
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(90deg, rgba(5, 5, 9, 0.98) 0%, rgba(5, 5, 9, 0.82) 24%, rgba(5, 5, 9, 0.14) 68%, rgba(5, 5, 9, 0.04) 100%),
+            linear-gradient(0deg, #050509 0%, rgba(5, 5, 9, 0.92) 18%, rgba(5, 5, 9, 0.02) 58%);
+    }
+
+    .hero-info {
+        position: absolute;
+        top: 9%;
+        left: 4.25%;
+        width: 34%;
+        max-width: 42rem;
+        color: #fff;
+
+        .hero-logo {
+            display: block;
+            width: auto;
+            max-width: 28rem;
+            height: 7rem;
+            object-fit: contain;
+            object-position: left center;
+            margin-bottom: 1.2rem;
+        }
+
+        .hero-title {
+            margin: 0 0 1rem;
+            font-size: 3.6rem;
+            font-weight: 700;
+            line-height: 1.02;
+            letter-spacing: -0.05em;
+        }
+
+        .hero-facts {
+            display: flex;
+            gap: 0.75rem;
+            min-height: 1.5rem;
+            margin-bottom: 0.9rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.76);
+            text-transform: capitalize;
+
+            span:not(:last-child)::after {
+                content: '·';
+                margin-left: 0.75rem;
+                color: rgba(255, 255, 255, 0.42);
+            }
+        }
+
+        .hero-description {
+            display: -webkit-box;
+            max-width: 36rem;
+            margin: 0;
+            overflow: hidden;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            font-size: 1.12rem;
+            line-height: 1.45;
+            color: rgba(255, 255, 255, 0.78);
+        }
+    }
+
+    .catalog-stage {
+        position: absolute;
+        right: 0;
+        bottom: 3.25%;
+        left: 4.25%;
+        height: 36%;
+        color: #fff;
+
+        .catalog-title {
+            height: 2.2rem;
+            margin: 0 0 0.75rem;
+            font-size: 1.35rem;
+            font-weight: 600;
+            line-height: 2.2rem;
+        }
+
+        .catalog-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            height: calc(100% - 3rem);
+            padding: 0.3rem 4rem 0.5rem 0.3rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            .tv-card {
+                flex: 0 0 13.25rem;
+                width: 13.25rem;
+                padding: 0.35rem;
+
+                &:global(.poster-shape-poster) {
+                    flex-basis: 9.25rem;
+                    width: 9.25rem;
+                }
+
+                &:focus-within, &.selected-card {
+                    z-index: 2;
+                    transform: translateY(-0.2rem);
+                }
+            }
+        }
+
+        .catalog-position {
+            position: absolute;
+            top: 0.45rem;
+            right: 2rem;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.45);
+        }
+    }
+
+    .loading-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2rem;
+        color: rgba(255, 255, 255, 0.65);
+    }
+
+    .board-warning-container {
+        position: absolute;
+        right: 1rem;
+        bottom: 1rem;
+        left: 1rem;
+        z-index: 5;
+    }
+}
+
+@media (max-height: 760px) {
+    .board-container {
+        .hero-info {
+            top: 7%;
+
+            .hero-logo {
+                height: 5.2rem;
+            }
+
+            .hero-title {
+                font-size: 2.8rem;
+            }
+        }
+
+        .catalog-stage {
+            height: 38%;
+            bottom: 2%;
+        }
+    }
+}

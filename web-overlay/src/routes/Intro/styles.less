@@ -1,0 +1,163 @@
+// Copyright (C) 2017-2026 Smart code 203358507
+
+.intro-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    color: #f7f7fa;
+    background: #09090f;
+
+    .background-container {
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at 82% 28%, rgba(102, 73, 207, 0.7), transparent 47%),
+            radial-gradient(circle at 12% 92%, rgba(77, 54, 157, 0.82), transparent 43%),
+            linear-gradient(118deg, #09090f 18%, #0d0b18 49%, #18102d 100%);
+    }
+
+    .brand-container, .language-container, .link-container { z-index: 1; }
+
+    .brand-container {
+        position: absolute;
+        top: 3.5rem;
+        left: 3.5rem;
+
+        .brand-logo {
+            display: block;
+            width: 17rem;
+            height: auto;
+            object-fit: contain;
+        }
+    }
+
+    .language-container {
+        position: absolute;
+        top: 4rem;
+        right: 4.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 1.8rem;
+        font-weight: 700;
+
+        .language-icon { width: 2.2rem; height: 2.2rem; }
+    }
+
+    .link-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: min(62rem, 82vw);
+        margin-top: 2.5rem;
+
+        .qr-frame {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: clamp(18rem, 21vw, 25rem);
+            aspect-ratio: 1;
+            margin-bottom: 3.2rem;
+            padding: 1.15rem;
+            border-radius: 1.4rem;
+            background: #fff;
+
+            .qr-code { display: block; width: 100%; height: 100%; object-fit: contain; }
+        }
+
+        .instructions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.4rem;
+            margin: 0 0 3.2rem;
+            padding: 0;
+            list-style: none;
+            counter-reset: tv-login-step;
+
+            li {
+                display: flex;
+                align-items: center;
+                gap: 0.7rem;
+                font-size: 1.7rem;
+                font-weight: 650;
+                counter-increment: tv-login-step;
+
+                &::before {
+                    content: counter(tv-login-step);
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex: none;
+                    width: 3.2rem;
+                    height: 3.2rem;
+                    margin-right: 0.1rem;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.09);
+                }
+            }
+
+            .link-label { color: #7955ff; }
+        }
+
+        .request-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.1rem;
+            min-width: 23rem;
+            height: 5.5rem;
+            padding: 0 2.4rem;
+            border-radius: 0.9rem;
+            color: #111117;
+            background: #f0f0f2;
+            font-size: 1.7rem;
+            font-weight: 750;
+
+            &:focus, &:hover {
+                outline: 0.35rem solid #fff;
+                outline-offset: 0.35rem;
+                background: #fff;
+                transform: scale(1.035);
+            }
+
+            .request-icon { width: 2rem; height: 2rem; }
+        }
+
+        .expiry-label, .error-label { margin-top: 1.5rem; font-size: 1.55rem; font-weight: 650; }
+        .expiry-label { opacity: 0.86; }
+        .error-label { color: #ff6c87; }
+
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            font-size: 1.6rem;
+
+            .loading-icon {
+                width: 5rem;
+                height: 5rem;
+                animation: login-pulse 900ms ease-in-out infinite alternate;
+            }
+        }
+    }
+}
+
+@keyframes login-pulse {
+    from { opacity: 0.4; }
+    to { opacity: 1; }
+}
+
+@media (max-aspect-ratio: 4 / 3) {
+    .intro-container {
+        .brand-container { top: 2.5rem; left: 2.5rem; }
+        .language-container { top: 3rem; right: 3rem; }
+        .link-container { transform: scale(0.9); }
+    }
+}
