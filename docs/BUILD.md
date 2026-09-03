@@ -37,7 +37,24 @@ To install JavaScript dependencies and produce the production web bundle:
 make stremio-web-build
 ```
 
-## 3. Build the OSMC rootfs overlay
+## 3. Prepare and audit the Stremio Service runtime
+
+```sh
+make stremio-service-audit
+```
+
+This fetches the pinned Stremio Service source only for provenance and
+architecture comparison. Its bundled x86-64 executables are rejected. The
+builder then combines the exact official Server 4.21.1 JavaScript bundle with
+the matching official Node.js 18.12.1 Linux ARMv7 hard-float runtime beneath
+`out/stremio-service-armhf/`.
+
+The output is not added to the rootfs yet. It deliberately reports
+`imageEligible: false` until compatible ARM `ffmpeg` and `ffprobe` inputs and
+the startup/playback tests pass. CI runs the Node/server startup smoke test
+under QEMU; that test does not claim media playback.
+
+## 4. Build the OSMC rootfs overlay
 
 ```sh
 make osmc-rootfs
@@ -58,7 +75,7 @@ The current overlay does **not** disable OSMC's Kodi startup. That switch would
 leave a black screen until the fullscreen Stremio shell and display hand-off
 are packaged and tested, so it remains a later gated change.
 
-## 4. Why `make image` remains blocked
+## 5. Why `make image` remains blocked
 
 The rootfs overlay is a reviewable development artifact, not a bootable release
 image. A derived installer image will be enabled only after:

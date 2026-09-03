@@ -104,6 +104,12 @@ class FetchSafetyTests(unittest.TestCase):
             ),
             "vero.img.gz",
         )
+        self.assertEqual(
+            self.fetch.safe_name(
+                "https://nodejs.org/dist/v18.12.1/node-v18.12.1-linux-armv7l.tar.xz"
+            ),
+            "node-v18.12.1-linux-armv7l.tar.xz",
+        )
         with self.assertRaises(ValueError):
             self.fetch.safe_name("https://example.com/app.apk")
 
@@ -115,6 +121,52 @@ class FetchSafetyTests(unittest.TestCase):
                 self.fetch.digest(path),
                 "4238de9419224e8813579ab4be59d04a09d3951f030beb87413828d66ed36e05",
             )
+
+
+class StremioServiceRuntimeTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.prepare = load_script("prepare_stremio_service")
+        cls.audit = load_script("audit_stremio_service")
+
+    @staticmethod
+    def armhf_elf(glibc: bytes = b"GLIBC_2.28") -> bytes:
+        payload = bytearray(52)
+        payload[:6] = b"\x7fELF\x01\x01"
+        struct.pack_into("<H", payload, 18, 40)
+        return bytes(payload) + b"/lib/ld-linux-armhf.so.3\0" + glibc
+
+    def test_armhf_node_contract(self) -> None:
+        details = self.prepare.verify_armhf_node(self.armhf_elf())
+        self.assertEqual(details["machine"], "ARM")
+        self.assertEqual(details["abi"], "armhf")
+        self.assertEqual(details["maximumGlibc"], "2.28")
+
+    def test_node_contract_rejects_wrong_architecture_and_new_glibc(self) -> None:
+        wrong_machine = bytearray(self.armhf_elf())
+        struct.pack_into("<H", wrong_machine, 18, 62)
+        with self.assertRaisesRegex(ValueError, "wrong ELF machine"):
+            self.prepare.verify_armhf_node(bytes(wrong_machine))
+        with self.assertRaisesRegex(ValueError, "newer than OSMC"):
+            self.prepare.verify_armhf_node(self.armhf_elf(b"GLIBC_2.32"))
+
+    def test_server_bundle_contract(self) -> None:
+        payload = b"x" * (1024 * 1024) + b"EngineFS FFMPEG_BIN FFPROBE_BIN 11470"
+        details = self.prepare.verify_server_js(payload)
+        self.assertEqual(details["httpPort"], 11470)
+        with self.assertRaisesRegex(ValueError, "missing expected markers"):
+            self.prepare.verify_server_js(b"x" * (1024 * 1024))
+
+    def test_tar_paths_and_elf_audit_are_strict(self) -> None:
+        self.assertTrue(self.prepare.safe_tar_member("node/bin/node"))
+        self.assertFalse(self.prepare.safe_tar_member("../node"))
+        self.assertFalse(self.prepare.safe_tar_member("/node"))
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory) / "node"
+            path.write_bytes(self.armhf_elf())
+            details = self.audit.elf_details(path)
+            self.assertEqual(details["machine"], "ARM")
+            self.assertEqual(details["bits"], 32)
 
 
 class BootProbeTests(unittest.TestCase):

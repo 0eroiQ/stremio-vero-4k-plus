@@ -38,9 +38,16 @@ hardware-compatibility gate.
 The official `Stremio/stremio-service` source is pinned separately. The web UI
 can compile without it, but a self-contained Vero appliance still needs the
 service for torrent and local streaming behavior. Upstream publishes an amd64
-Debian package; this project must build and validate its Rust service and
-bundled runtime for OSMC Bullseye armhf before claiming a complete Stremio
-system.
+Debian package and bundles x86-64 builds of `stremio-runtime`, `ffmpeg` and
+`ffprobe`; those files are explicitly rejected for Vero.
+
+The service source identifies its runtime as Node.js 18.12.1. This project pins
+the matching official Node.js Linux `armv7l` archive and the exact official
+Stremio Server 4.21.1 JavaScript bundle. The prepared Node executable is
+verified as 32-bit ARM hard-float and requires at most GLIBC 2.28, which is
+within the pinned OSMC Bullseye GLIBC 2.31 baseline. This proves architecture
+compatibility only. ARM `ffmpeg` and `ffprobe`, startup under emulation and
+physical Vero playback remain explicit gates.
 
 ## Kodi settings provenance
 

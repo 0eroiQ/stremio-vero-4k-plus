@@ -44,3 +44,23 @@ jobs:
         run: make stremio-web-build
       - name: Lint the prepared Stremio source
         run: corepack pnpm --dir out/stremio-web-src run lint
+
+  stremio-service-armhf:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12.14"
+      - name: Prepare and audit the official Stremio Service payload
+        run: make stremio-service-audit
+      - name: Install the isolated ARM userspace emulator
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            libc6-armhf-cross \
+            libstdc++6-armhf-cross \
+            qemu-user-static=1:8.2.2+ds-0ubuntu1.18
+      - name: Start the official server on the ARM runtime
+        run: make stremio-service-smoke

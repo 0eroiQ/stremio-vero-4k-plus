@@ -42,6 +42,24 @@
       "use": "official-streaming-service-armhf-port-input"
     },
     {
+      "name": "Stremio Server 4.21.1 JavaScript bundle",
+      "url": "https://dl.strem.io/server/v4.21.1/desktop/server.js",
+      "license": "GPL-2.0-only-and-bundled-third-party",
+      "revision_type": "release",
+      "revision": "4.21.1",
+      "sha256": "405eb494d6708406a30e716c3cfb5abae7a5e9c7a8b79446d64c3f821385930f",
+      "use": "official-architecture-neutral-streaming-server-payload"
+    },
+    {
+      "name": "Node.js 18.12.1 Linux armv7l runtime",
+      "url": "https://nodejs.org/dist/v18.12.1/node-v18.12.1-linux-armv7l.tar.xz",
+      "license": "MIT-and-third-party",
+      "revision_type": "release",
+      "revision": "18.12.1-linux-armv7l",
+      "sha256": "d0131a764c0f44821fdacb3c3ab8b35b52af060a98ac7a150ec49d4c540be3d7",
+      "use": "armhf-replacement-for-the-upstream-x86-64-stremio-runtime"
+    },
+    {
       "name": "OSMC distribution recipes",
       "url": "https://github.com/osmc/osmc.git",
       "license": "GPL-2.0-only",
@@ -76,7 +94,8 @@
     }
   ],
   "unresolved": [
-    "Build and prove the official Stremio Service and runtime on OSMC Bullseye armhf",
+    "Provide and prove compatible ARM hard-float ffmpeg and ffprobe for Stremio Server",
+    "Complete the Stremio Service ARM startup smoke test and Vero integration test",
     "Select and prove a fullscreen WPE or WebKit kiosk host on OSMC Bullseye armhf",
     "Complete Stremio stream interception and Kodi display hand-off",
     "Connect narrow ConnMan BlueZ CEC and OSMC lifecycle adapters",
