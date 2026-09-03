@@ -16,17 +16,31 @@ import urllib.error
 import urllib.request
 
 
-def wait_for_http(process: subprocess.Popen[bytes], timeout: float) -> int:
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, request, file_pointer, code, message, headers, new_url):
+        return None
+
+
+PROBE_OPENER = urllib.request.build_opener(NoRedirect)
+
+
+def wait_for_http(
+    process: subprocess.Popen[bytes],
+    timeout: float,
+    url: str = "http://127.0.0.1:11470/",
+) -> int:
     deadline = time.monotonic() + timeout
     last_error = "service did not open port 11470"
     while time.monotonic() < deadline:
         if process.poll() is not None:
             raise RuntimeError(f"service exited early with status {process.returncode}")
         try:
-            with urllib.request.urlopen("http://127.0.0.1:11470/", timeout=1) as response:
+            with PROBE_OPENER.open(url, timeout=1) as response:
                 return response.status
         except urllib.error.HTTPError as error:
-            return error.code
+            code = error.code
+            error.close()
+            return code
         except (urllib.error.URLError, TimeoutError, socket.timeout) as error:
             last_error = str(error)
             time.sleep(0.25)
