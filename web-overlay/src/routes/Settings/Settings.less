@@ -1,4 +1,4 @@
-// Ten-foot settings composition: section rail plus one calm, readable content plane.
+// Ten-foot settings composition: category rail plus one active TV panel.
 
 @import (reference) '~stremio/common/screen-sizes.less';
 
@@ -15,17 +15,60 @@
         width: 100%;
         height: 100%;
         display: grid;
-        grid-template-columns: 17rem minmax(0, 1fr);
-        padding: 2.2rem 4.25% 2rem;
-        gap: 2.4rem;
+        grid-template-columns: 19rem minmax(0, 1fr);
+        padding: 2rem 3.4% 1.8rem;
+        gap: 2rem;
         overflow: hidden;
+
+        .settings-stage {
+            min-width: 0;
+            height: 100%;
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr);
+            padding: 2rem 2.25rem 0;
+            border: 0.08rem solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background: linear-gradient(145deg, rgba(28, 27, 39, 0.92), rgba(11, 11, 17, 0.92));
+            box-shadow: 0 1.4rem 4rem rgba(0, 0, 0, 0.28);
+        }
+
+        .stage-header {
+            padding: 0 0 1.35rem;
+            border-bottom: 0.08rem solid rgba(255, 255, 255, 0.08);
+
+            .stage-eyebrow {
+                margin-bottom: 0.45rem;
+                font-size: 0.72rem;
+                font-weight: 700;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--primary-accent-color);
+            }
+
+            .stage-title {
+                margin: 0;
+                font-size: 2.45rem;
+                font-weight: 720;
+                line-height: 1.1;
+                letter-spacing: -0.035em;
+                color: #fff;
+            }
+
+            .stage-description {
+                margin: 0.55rem 0 0;
+                font-size: 1rem;
+                color: rgba(255, 255, 255, 0.58);
+            }
+        }
 
         .sections-container {
             min-width: 0;
-            height: 100%;
-            padding: 0 3rem 5rem 0;
+            min-height: 0;
+            padding: 1.35rem 0 4rem;
+            overflow-x: hidden;
             overflow-y: auto;
-            scroll-padding: 1rem 0 5rem;
+            scroll-padding: 1.35rem 0 4rem;
             scrollbar-width: none;
 
             &::-webkit-scrollbar {
@@ -37,8 +80,16 @@
 
 @media (max-height: 760px) {
     .settings-container .settings-content {
-        padding-top: 1.25rem;
+        padding-top: 1rem;
         padding-bottom: 1rem;
+
+        .settings-stage {
+            padding-top: 1.4rem;
+        }
+
+        .stage-header {
+            padding-bottom: 1rem;
+        }
     }
 }
 
@@ -47,6 +98,11 @@
         display: block;
         padding-right: 1.5rem;
         padding-left: 1.5rem;
+
+        .settings-stage {
+            padding-right: 1.2rem;
+            padding-left: 1.2rem;
+        }
 
         .sections-container {
             padding-right: 0;

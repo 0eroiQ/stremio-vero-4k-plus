@@ -167,12 +167,17 @@ class TvUiOverlayTests(unittest.TestCase):
         section_styles = SETTINGS_SECTION_STYLES.read_text(encoding="utf-8")
         option_styles = SETTINGS_OPTION_STYLES.read_text(encoding="utf-8")
 
-        self.assertIn("grid-template-columns: 17rem minmax(0, 1fr)", route_styles)
-        self.assertIn("data-tv-row={'settings-menu'} data-tv-item={0}", menu)
-        self.assertIn("content: 'Settings'", menu_styles)
-        self.assertIn("width: min(54rem, 100%)", section_styles)
+        self.assertIn("grid-template-columns: 19rem minmax(0, 1fr)", route_styles)
+        self.assertIn("settings-stage", route_styles)
+        self.assertIn("activeSection.content", (ROOT / "web-overlay" / "src" / "routes" / "Settings" / "Settings.tsx").read_text(encoding="utf-8"))
+        self.assertIn("data-tv-row={'settings-menu'}", menu)
+        self.assertIn("Choose a category", menu)
+        self.assertIn("onKeyDown={onKeyDown}", menu)
+        self.assertIn("event.stopPropagation()", menu)
+        self.assertIn("min-height: 4.35rem", menu_styles)
+        self.assertIn("width: min(68rem, 100%)", section_styles)
         self.assertIn("grid-template-columns: minmax(12rem, 1fr) minmax(13rem, 0.8fr)", option_styles)
-        self.assertIn("&:hover, &:focus", option_styles)
+        self.assertIn("&:focus-within", option_styles)
 
 
 if __name__ == "__main__":

@@ -1,9 +1,8 @@
 // Based on Stremio Web. Copyright (C) 2017-2023 Smart code 203358507
 
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import classnames from 'classnames';
-import throttle from 'lodash.throttle';
-import { usePlatform, useProfile, useStreamingServer, useRouteFocused, withCoreSuspender } from 'stremio/common';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { usePlatform, useProfile, useStreamingServer, withCoreSuspender } from 'stremio/common';
 import { MainNavBars } from 'stremio/components';
 import { SECTIONS } from './constants';
 import Menu from './Menu';
@@ -17,85 +16,74 @@ import Info from './Info';
 import styles from './Settings.less';
 
 const Settings = () => {
-    const routeFocused = useRouteFocused();
+    const { t } = useTranslation();
     const profile = useProfile();
     const platform = usePlatform();
     const streamingServer = useStreamingServer();
 
-    const sectionsContainerRef = useRef<HTMLDivElement>(null);
-    const generalSectionRef = useRef<HTMLDivElement>(null);
-    const interfaceSectionRef = useRef<HTMLDivElement>(null);
-    const playerSectionRef = useRef<HTMLDivElement>(null);
-    const streamingServerSectionRef = useRef<HTMLDivElement>(null);
-    const veroSectionRef = useRef<HTMLDivElement>(null);
-    const shortcutsSectionRef = useRef<HTMLDivElement>(null);
-
-    const sections = useMemo(() => ([
-        { ref: generalSectionRef, id: SECTIONS.GENERAL },
-        { ref: interfaceSectionRef, id: SECTIONS.INTERFACE },
-        { ref: playerSectionRef, id: SECTIONS.PLAYER },
-        { ref: streamingServerSectionRef, id: SECTIONS.STREAMING },
-        { ref: veroSectionRef, id: SECTIONS.VERO },
-        { ref: shortcutsSectionRef, id: SECTIONS.SHORTCUTS },
-    ]), []);
-
     const [selectedSectionId, setSelectedSectionId] = useState(SECTIONS.GENERAL);
 
-    const updateSelectedSectionId = useCallback(() => {
-        const container = sectionsContainerRef.current;
-        if (!container) return;
-
-        const availableSections = sections.filter((section) => section.ref.current);
-        if (!availableSections.length) return;
-
-        const { scrollTop, clientHeight, scrollHeight, offsetTop } = container;
-        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
-
-        if (isAtBottom) {
-            setSelectedSectionId(availableSections[availableSections.length - 1].id);
-            return;
-        }
-
-        const marker = scrollTop + 50;
-        const activeSection = availableSections.reduce((current, section) => {
-            const sectionTop = section.ref.current!.offsetTop + offsetTop;
-            return sectionTop <= marker ? section : current;
-        }, availableSections[0]);
-
-        setSelectedSectionId(activeSection.id);
-    }, [sections]);
-
     const onMenuSelect = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-        const section = sections.find((item) => item.id === event.currentTarget.dataset.section);
-        const container = sectionsContainerRef.current;
-        section && container?.scrollTo({
-            top: section.ref.current!.offsetTop - container.offsetTop,
-            behavior: 'smooth'
-        });
-    }, [sections]);
+        const sectionId = event.currentTarget.dataset.section;
+        if (sectionId) setSelectedSectionId(sectionId);
+    }, []);
 
-    const onContainerScroll = useCallback(throttle(() => {
-        updateSelectedSectionId();
-    }, 50), []);
-
-    useLayoutEffect(() => {
-        if (routeFocused) updateSelectedSectionId();
-    }, [routeFocused]);
+    const activeSection = useMemo(() => {
+        switch (selectedSectionId) {
+            case SECTIONS.INTERFACE:
+                return {
+                    title: t('INTERFACE'),
+                    description: 'Language and how Stremio looks on this TV.',
+                    content: <Interface profile={profile} />,
+                };
+            case SECTIONS.PLAYER:
+                return {
+                    title: t('SETTINGS_NAV_PLAYER'),
+                    description: 'Subtitles, audio, controls and autoplay.',
+                    content: <Player profile={profile} />,
+                };
+            case SECTIONS.STREAMING:
+                return {
+                    title: t('SETTINGS_NAV_STREAMING'),
+                    description: 'Streaming server, cache and connection options.',
+                    content: <Streaming profile={profile} streamingServer={streamingServer} />,
+                };
+            case SECTIONS.VERO:
+                return {
+                    title: 'Vero 4K+ Device',
+                    description: 'Picture, HDMI audio and Vero system services.',
+                    content: <Vero />,
+                };
+            case SECTIONS.SHORTCUTS:
+                return {
+                    title: t('SETTINGS_NAV_SHORTCUTS'),
+                    description: 'Remote and keyboard controls.',
+                    content: !platform.isMobile ? <Shortcuts /> : null,
+                };
+            default:
+                return {
+                    title: t('SETTINGS_NAV_GENERAL'),
+                    description: 'Your account, connected services and privacy.',
+                    content: <><General profile={profile} /><Info streamingServer={streamingServer} /></>,
+                };
+        }
+    }, [platform.isMobile, profile, selectedSectionId, streamingServer, t]);
 
     return (
         <MainNavBars className={styles['settings-container']} route={'settings'}>
-            <div className={classnames(styles['settings-content'], 'animation-fade-in')}>
+            <div className={`${styles['settings-content']} animation-fade-in`}>
                 <Menu selected={selectedSectionId} streamingServer={streamingServer} onSelect={onMenuSelect} />
 
-                <div ref={sectionsContainerRef} className={styles['sections-container']} onScroll={onContainerScroll}>
-                    <General ref={generalSectionRef} profile={profile} />
-                    <Interface ref={interfaceSectionRef} profile={profile} />
-                    <Player ref={playerSectionRef} profile={profile} />
-                    <Streaming ref={streamingServerSectionRef} profile={profile} streamingServer={streamingServer} />
-                    <Vero ref={veroSectionRef} />
-                    { !platform.isMobile && <Shortcuts ref={shortcutsSectionRef} /> }
-                    <Info streamingServer={streamingServer} />
-                </div>
+                <main className={styles['settings-stage']}>
+                    <header className={styles['stage-header']}>
+                        <div className={styles['stage-eyebrow']}>Stremio for Vero 4K+</div>
+                        <h1 className={styles['stage-title']}>{activeSection.title}</h1>
+                        <p className={styles['stage-description']}>{activeSection.description}</p>
+                    </header>
+                    <div key={selectedSectionId} className={`${styles['sections-container']} animation-fade-in`}>
+                        {activeSection.content}
+                    </div>
+                </main>
             </div>
         </MainNavBars>
     );

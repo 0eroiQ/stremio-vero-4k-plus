@@ -1,15 +1,24 @@
 .option {
     position: relative;
     width: 100%;
-    min-height: 3.7rem;
+    min-height: 4.5rem;
     flex: none;
     display: grid;
     grid-template-columns: minmax(12rem, 1fr) minmax(13rem, 0.8fr);
     align-items: center;
     gap: 1.6rem;
-    padding: 0.55rem 0.45rem;
-    border-top: 0.06rem solid rgba(255, 255, 255, 0.055);
+    margin-bottom: 0.45rem;
+    padding: 0.7rem 0.85rem;
+    border: 0.08rem solid rgba(255, 255, 255, 0.055);
+    border-radius: 0.9rem;
+    background: rgba(8, 8, 13, 0.38);
     overflow: visible;
+
+    &:focus-within {
+        border-color: rgba(255, 255, 255, 0.72);
+        background: rgba(255, 255, 255, 0.09);
+        box-shadow: 0 0 0 0.12rem rgba(255, 255, 255, 0.18);
+    }
 
     .heading, .content {
         min-width: 0;
@@ -31,9 +40,9 @@
             overflow: hidden;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
-            font-size: 0.94rem;
-            line-height: 1.25rem;
-            color: rgba(255, 255, 255, 0.82);
+            font-size: 1rem;
+            line-height: 1.3rem;
+            color: rgba(255, 255, 255, 0.88);
         }
     }
 
@@ -50,7 +59,7 @@
 
         :global(.button) {
             min-width: 10rem;
-            min-height: 2.65rem;
+            min-height: 3rem;
             display: flex;
             align-items: center;
             justify-content: center;
