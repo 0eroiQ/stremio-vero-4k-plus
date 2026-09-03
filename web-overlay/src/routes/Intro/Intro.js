@@ -25,7 +25,7 @@ const useAuthLink = (core, loadLinkAction) => {
             try {
                 const state = await core.transport.getState('auth_link');
                 if (mounted) setAuthLink(state);
-            } catch (error) {
+            } catch (_error) {
                 if (mounted) setAuthLink({ code: null, data: null });
             }
         };
