@@ -20,7 +20,9 @@ experience on the OSMC Vero 4K+ hardware.
 ## Current stage
 
 Stage 0: upstream provenance and safety scaffolding. The public repository and
-CI checks are active; no bootable artifact has been published.
+CI checks are active. An offline Vero multi-DTB can now be reproduced with the
+Vero 4K+ internal eMMC controller disabled; it is a component for a future boot
+probe, not a bootable image, and it has not been tested on hardware.
 
 The TV interface in the project reference is the official Stremio Android TV
 experience. The open-source Stremio Linux shell is a desktop client and is not
@@ -40,6 +42,7 @@ Every build and test gate is documented in [docs/SAFETY.md](docs/SAFETY.md).
 | Component | Status |
 | --- | --- |
 | Repository and CI safety checks | Passing |
+| eMMC-disabled Vero 4K+ multi-DTB | Reproducible offline; hardware not tested |
 | Exact Vero 4K+ upstream source lock | Researching |
 | Stremio TV runtime/distribution path | Android TV route selected; licensing gate open |
 | Reproducible root filesystem | Not started |
@@ -54,6 +57,17 @@ Run the non-destructive repository checks:
 ```sh
 make check
 ```
+
+After installing the Device Tree Compiler tools, reproduce the first guarded
+boot component beneath the ignored `out/` directory:
+
+```sh
+make safe-dtb
+```
+
+The builder reads the checksummed official kernel package, changes only the
+Vero 4K+ eMMC `status` property, verifies that SD and SDIO remain enabled, and
+writes a checksum manifest marked `physical_boot_tested: false`.
 
 `make image` intentionally refuses to run until the upstream inputs and image
 layout are reviewed and locked.

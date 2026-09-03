@@ -1,4 +1,4 @@
-.PHONY: check safety sources test preflight fetch-inputs image
+.PHONY: check safety sources test preflight fetch-inputs safe-dtb image
 
 check: safety sources test
 
@@ -16,6 +16,13 @@ preflight:
 
 fetch-inputs:
 	@python3 scripts/fetch_verified.py sources/sources.lock.json
+
+safe-dtb:
+	@python3 scripts/fetch_verified.py sources/sources.lock.json \
+	  --name "OSMC Vero 4K+ kernel package 4.9.269-62"
+	@python3 scripts/build_safe_dtb.py \
+	  --kernel-deb .cache/downloads/vero364-image-4.9.269-62-osmc_4.9.269-62-osmc_arm64.deb \
+	  --output out/boot-probe/dtb-external-only.img
 
 image:
 	@printf '%s\n' \

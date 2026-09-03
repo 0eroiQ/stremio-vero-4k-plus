@@ -3,6 +3,8 @@
 ## Phase 0 — source and recovery proof
 
 - Create the public project and continuous safety checks.
+- Reproduce and inspect an eMMC-disabled Vero 4K+ multi-DTB offline. (Complete;
+  physical boot remains untested.)
 - Pin exact upstream Vero sources and document their licenses.
 - Resolve the official Stremio TV runtime and redistribution path.
 - Document exact-model OSMC recovery without running it.
@@ -35,4 +37,3 @@ Exit condition: recorded acceptance evidence for every feature.
   destructive confirmation.
 - Keep internal installation disabled until a separate recovery and rollback
   design is proven.
-

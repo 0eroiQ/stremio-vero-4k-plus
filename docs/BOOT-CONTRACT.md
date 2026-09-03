@@ -41,3 +41,14 @@ on the exact Vero 4K+ hardware.
 - Minimal non-installer initramfs.
 - Separate removable root/data partitions with deterministic UUIDs.
 
+## First completed component
+
+`make safe-dtb` now reproduces the official two-entry Amlogic multi-DTB and
+changes only the Vero 4K+ (`gxl/p231/2g`) eMMC controller status from `okay` to
+`disabled`. The Vero SD and SDIO controller statuses are independently checked
+as `okay`, and a semantic before/after comparison rejects any additional node
+or property change.
+
+This is offline structural evidence only. It does not prove that the factory
+bootloader will select or boot the modified tree, and it is not permission to
+prepare removable media.

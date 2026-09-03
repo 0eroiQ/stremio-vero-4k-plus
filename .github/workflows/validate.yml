@@ -16,4 +16,9 @@ jobs:
         with:
           python-version: "3.12"
       - run: make check
-
+      - name: Install device-tree tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes device-tree-compiler
+      - name: Rebuild and verify the external-only Vero DTB
+        run: make safe-dtb
