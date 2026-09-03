@@ -24,6 +24,21 @@ const NavTabButton = ({ className, logo, icon, label, href, selected, expanded, 
         });
     };
     const onKeyDown = React.useCallback((event) => {
+        if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+            const nav = event.currentTarget.closest('nav');
+            const items = Array.from(nav?.querySelectorAll('a[tabindex="0"]') || []);
+            const currentIndex = items.indexOf(event.currentTarget);
+            const offset = event.key === 'ArrowDown' ? 1 : -1;
+            const nextIndex = Math.min(Math.max(currentIndex + offset, 0), items.length - 1);
+
+            if (currentIndex !== -1 && nextIndex !== currentIndex) {
+                event.preventDefault();
+                event.stopPropagation();
+                items[nextIndex].focus();
+            }
+            return;
+        }
+
         if (event.key !== 'ArrowRight') {
             return;
         }
@@ -44,7 +59,7 @@ const NavTabButton = ({ className, logo, icon, label, href, selected, expanded, 
                 [styles['expanded']]: expanded,
             })}
             title={label}
-            tabIndex={0}
+            tabIndex={logo ? -1 : 0}
             to={href}
             onClick={onClick}
             onDoubleClick={onDoubleClick}

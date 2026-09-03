@@ -3,9 +3,11 @@
 @import (reference) '~stremio/common/screen-sizes.less';
 
 .vertical-nav-bar-container {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    justify-content: center;
     gap: 0.55rem;
     width: var(--vertical-nav-bar-size);
     padding: 1rem 0.6rem;
@@ -21,14 +23,14 @@
     }
 
     &.expanded {
-        width: 18vw;
-        min-width: 22rem;
+        width: 11.5rem;
+        min-width: 11.5rem;
         background: rgba(5, 5, 9, 0.97);
         box-shadow: 1.5rem 0 3rem rgba(0, 0, 0, 0.5);
 
         .nav-tab-button {
-            width: calc(18vw - 1.2rem);
-            min-width: 20.8rem;
+            width: 10.3rem;
+            min-width: 10.3rem;
         }
     }
 
@@ -40,14 +42,23 @@
     }
 
     .nav-tab-button:first-child {
-        margin-bottom: 1rem;
+        position: absolute;
+        top: 1rem;
+        left: 0.6rem;
+    }
+}
+
+@media only screen and (max-height: 38rem) {
+    .vertical-nav-bar-container {
+        justify-content: flex-start;
+        padding-top: 5.7rem;
     }
 }
 
 @media only screen and (max-width: @minimum) {
     .vertical-nav-bar-container {
         &.expanded {
-            width: 42vw;
+            width: 11.5rem;
         }
     }
 }
