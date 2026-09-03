@@ -1,0 +1,19 @@
+[Unit]
+Description=Stremio for Vero local web interface
+After=network.target stremio-vero-settings.service
+
+[Service]
+Type=simple
+User=osmc
+Group=osmc
+ExecStart=/usr/bin/python3 /usr/lib/stremio-vero/web-server.py --root /usr/share/stremio-vero/web --bind 127.0.0.1 --port 8765
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+RestrictAddressFamilies=AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

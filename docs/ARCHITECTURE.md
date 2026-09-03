@@ -1,55 +1,74 @@
 # Architecture decision record
 
-## Required experience
+## Decision
 
-The product must present a television-first Stremio interface with directional
-remote navigation, a left icon rail, focused-title metadata, and horizontal
-content rows. A conventional Linux desktop window is not acceptable.
+The base is the final official OSMC Vero 4K/4K+ image, not Android/AOSP and not
+a replacement kernel. We keep the Vero boot chain, Linux kernel, firmware,
+AMCodec integration, audio stack, CEC, RF remote, ConnMan and BlueZ.
 
-## Layers
+The official Stremio Web application is the visible product. It already uses
+Stremio Core for the real account, add-ons, catalogs, Library, Continue
+Watching and progress. A Vero overlay adds only the device-specific settings
+and shell integration.
 
-1. **Vero hardware layer** — exact Vero 4K+ boot chain, kernel, device tree,
-   firmware, remote/CEC, HDMI, audio, networking, and video decoder support.
-2. **Appliance runtime** — minimal read-only userspace with no general-purpose
-   desktop and no internal-storage installer.
-3. **Stremio runtime** — official account, catalog, add-on, library, progress,
-   and streaming behavior.
-4. **TV presentation** — the official TV experience when a permitted and
-   technically compatible distribution route is established.
-5. **Vero Settings** — a small D-pad interface for network, Bluetooth, remote,
-   display, audio, updates, diagnostics, restart, and shutdown.
+## Runtime layers
 
-## Decision: TV runtime
+1. **OSMC base** — unchanged Vero bootloader, kernel, DTB, firmware and Debian
+   armhf userspace.
+2. **Stremio kiosk shell** — a fullscreen WebKit/WPE host for the pinned
+   official Stremio Web build, with D-pad navigation and no desktop.
+3. **Settings Bridge** — a localhost-only API. It queues validated settings,
+   maps supported values to Kodi JSON-RPC, and later exposes narrow ConnMan,
+   BlueZ, CEC and updater operations.
+4. **Playback Bridge** — accepts a resolved Stremio stream, suspends the kiosk
+   display, starts Kodi directly in playback, synchronizes state and progress,
+   stops Kodi when playback finishes, and restores Stremio.
+5. **Kodi VideoPlayer** — retained as the Vero hardware playback engine. Kodi
+   Home, Estuary and Kodi Settings are not part of the normal user experience.
 
-The official open-source Linux shell is a desktop client. The reference TV
-interface is delivered by Stremio's native Android TV application. The project
-will not imitate the screenshot with hard-coded data and will not claim that
-the desktop shell is the TV client.
+## Display ownership
 
-The selected technical direction is a minimal Vero-specific Android TV/AOSP
-runtime. On first setup it will download the unmodified ARMv7 APK from the
-official Stremio download host, verify a reviewed SHA-256 value, and install it
-as a normal data application. The image will not bundle or re-sign the APK.
+Kodi GBM and the kiosk shell cannot be assumed to own the DRM display at the
+same time. The first implementation therefore uses an explicit hand-off:
 
-This decision gives the requested TV UI, but it introduces a hard platform
-gate: Vero 4K+ has no official Android image. Its Android board definition,
-graphics composer, codec HAL, audio, CEC, input, networking, SELinux policy,
-and update path must be built and validated for this exact hardware.
+```text
+Stremio visible -> suspend kiosk -> start Kodi/player -> stop Kodi -> resume Stremio
+```
 
-## Playback gate
+The Settings Bridge persists choices while Kodi is stopped and applies them
+after Kodi JSON-RPC becomes ready, before `Player.Open`.
 
-The presence of an Amlogic video driver is not proof that Android MediaCodec
-or Stremio's bundled players can use it. Hardware decode, zero-copy presentation, HDR
-metadata, refresh-rate switching, and HDMI passthrough are separate target
-tests.
+## Settings ownership
 
-## Rejected as the primary product
+- **Stremio Core:** account, add-ons, interface language, Library and native
+  Stremio player preferences.
+- **Playback Bridge:** stream hand-off, progress, selected audio/subtitle
+  tracks, seek and stop events.
+- **Kodi:** refresh-rate switching, AMCodec/HDR mode, audio channel layout,
+  passthrough codecs and subtitle renderer values.
+- **OSMC Linux:** Ethernet/Wi-Fi, Bluetooth, CEC, system information, update,
+  restart and shutdown.
 
-- **Stremio Linux shell:** real Stremio, but desktop GTK/WebKit UI rather than
-  the requested television application.
-- **Styled screenshot clone:** would repeat the earlier hard-coded UI problem
-  and would not be the official Stremio application.
-- **Raspberry Pi Stremio OS image:** uses a Pi-specific LineageOS build and
-  cannot be repackaged for the Amlogic Vero hardware.
-- **Stock OSMC removable image:** it is an installer that repartitions internal
-  storage, not a live SD operating system.
+All Kodi IDs in the bridge come from the `settings.xml` contained in the pinned
+OSMC 2025.03-1 image. Unsupported settings are reported; they are not silently
+invented or written to `guisettings.xml`.
+
+## Image construction
+
+The official compressed installer image is a read-only input. The builder:
+
+1. verifies its SHA-256;
+2. reads `filesystem.tar.xz` from the image's FAT32 partition;
+3. streams the original tar entries into a new archive;
+4. replaces only allowlisted overlay paths;
+5. writes a manifest containing input, overlay and output hashes.
+
+The current milestone outputs a transformed rootfs archive, not install media.
+Image repacking and physical writing are separate gates.
+
+## Rejected directions
+
+- Android TV/AOSP, because Vero 4K+ has no supported Android HAL/codec stack.
+- A custom screenshot clone, because it would not contain real Stremio data.
+- Removing Kodi before libmpv/WPE has proven equivalent Vero hardware decode,
+  HDR, refresh-rate and HDMI passthrough behavior.

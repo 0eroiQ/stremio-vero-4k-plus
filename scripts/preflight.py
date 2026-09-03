@@ -12,7 +12,7 @@ import shutil
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PROFILES = {
     "kernel": {"free_gib": 20, "tools": ("git", "python3")},
-    "aosp": {"free_gib": 180, "tools": ("git", "python3", "java")},
+    "osmc": {"free_gib": 4, "tools": ("git", "python3", "node")},
 }
 
 
@@ -45,4 +45,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

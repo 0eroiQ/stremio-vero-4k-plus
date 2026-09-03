@@ -98,6 +98,12 @@ class FetchSafetyTests(unittest.TestCase):
         self.assertEqual(
             self.fetch.safe_name("https://dl.strem.io/path/app.apk"), "app.apk"
         )
+        self.assertEqual(
+            self.fetch.safe_name(
+                "https://ftp.fau.de/osmc/osmc/download/installers/diskimages/vero.img.gz"
+            ),
+            "vero.img.gz",
+        )
         with self.assertRaises(ValueError):
             self.fetch.safe_name("https://example.com/app.apk")
 

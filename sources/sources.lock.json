@@ -2,26 +2,52 @@
   "schema": 1,
   "status": "research",
   "target": {
-    "product": "OSMC Vero 4K+",
+    "product": "Stremio for Vero 4K+",
+    "base": "OSMC 2025.03-1",
     "board_family": "vero3",
     "soc_family": "Amlogic S905D"
   },
   "sources": [
+    {
+      "name": "OSMC Vero 4K and 4K+ installer image 2025.03-1",
+      "url": "https://ftp.fau.de/osmc/osmc/download/installers/diskimages/OSMC_TGT_vero3_20250303.img.gz",
+      "license": "GPL-family-and-component-specific",
+      "revision_type": "release",
+      "revision": "2025.03-1",
+      "sha256": "a7736298e5c14f705223d4c9a2b560fdc62e819533acccbc78dad3954de63187",
+      "use": "read-only-base-image-input"
+    },
+    {
+      "name": "Stremio Web",
+      "url": "https://github.com/Stremio/stremio-web.git",
+      "license": "GPL-2.0-only",
+      "revision_type": "git",
+      "revision": "6303c9947967afff70faaa1071171bfd9b4b30d8",
+      "use": "official-ui-and-stremio-core-web-client"
+    },
+    {
+      "name": "Stremio Linux shell",
+      "url": "https://github.com/Stremio/stremio-linux-shell.git",
+      "license": "GPL-3.0-only",
+      "revision_type": "git",
+      "revision": "c6e7cd22e23ed6401e573fe7fe1a023fc07399a2",
+      "use": "webkit-and-player-architecture-reference"
+    },
+    {
+      "name": "Stremio Service",
+      "url": "https://github.com/Stremio/stremio-service.git",
+      "license": "GPL-2.0-only",
+      "revision_type": "git",
+      "revision": "1891799734acba88904f9f62cb8ca491873b36fb",
+      "use": "official-streaming-service-armhf-port-input"
+    },
     {
       "name": "OSMC distribution recipes",
       "url": "https://github.com/osmc/osmc.git",
       "license": "GPL-2.0-only",
       "revision_type": "git",
       "revision": "812f491d789991a7a93192575e995d1b66b44590",
-      "use": "reference-and-build-recipe"
-    },
-    {
-      "name": "OSMC Vero 4K and 4K+ Linux kernel",
-      "url": "https://github.com/osmc/vero3-linux.git",
-      "license": "GPL-2.0-family",
-      "revision_type": "git",
-      "revision": "8a1ef693b11196df698b0d6de4b1c2b0a16ecc55",
-      "use": "candidate-kernel-base"
+      "use": "package-and-image-build-reference"
     },
     {
       "name": "OSMC Vero bootloader source",
@@ -29,7 +55,15 @@
       "license": "GPL-2.0-or-later-and-mixed",
       "revision_type": "git",
       "revision": "c3641ad50217bcbc24959c45941ed8147b60182f",
-      "use": "reference-only"
+      "use": "removable-boot-safety-reference"
+    },
+    {
+      "name": "OSMC Vero 4K and 4K+ Linux kernel",
+      "url": "https://github.com/osmc/vero3-linux.git",
+      "license": "GPL-2.0-family",
+      "revision_type": "git",
+      "revision": "8a1ef693b11196df698b0d6de4b1c2b0a16ecc55",
+      "use": "unchanged-base-kernel-reference"
     },
     {
       "name": "OSMC Vero 4K+ kernel package 4.9.269-62",
@@ -38,34 +72,15 @@
       "revision_type": "release",
       "revision": "4.9.269-62-osmc_arm64",
       "sha256": "f78c3afc7f9f4a6942e0db56d02a582aededb94a7dbfc449ee223a7603389712",
-      "use": "known-good-kernel-inspection"
-    },
-    {
-      "name": "Stremio OS for Raspberry Pi",
-      "url": "https://github.com/Stremio/stremio-os-rpi.git",
-      "license": "NOASSERTION",
-      "revision_type": "git",
-      "revision": "5bc6f7bf6739584d545c45c410ccfaa8e1413c88",
-      "use": "architecture-reference-only"
-    },
-    {
-      "name": "Stremio Android TV ARM APK 1.10.4",
-      "url": "https://dl.strem.io/android/v1.10.4-androidTV/com.stremio.one-1.10.4-31048580-armeabi-v7a.apk",
-      "license": "LicenseRef-Stremio-Official-Binary",
-      "revision_type": "release",
-      "revision": "1.10.4-31048580-armeabi-v7a",
-      "sha256": "e18a5405bb53e12a903ff477457318b8f8d3c8e1995e0a4c3ff5d8893d1ccf0b",
-      "use": "first-run-download-only"
+      "use": "existing-storage-blind-boot-probe-input"
     }
   ],
   "unresolved": [
-    "Reconcile the official 4.9.269-62 configuration with an eMMC-disabled external DTB",
-    "Exact Vero 4K+ device tree, boot image layout, firmware, and userspace ABI",
-    "Written redistribution and trademark guidance for the official Stremio TV application",
-    "A Vero-specific Android board configuration and userspace hardware abstraction layer",
-    "Hardware-decoded playback through Android MediaCodec on Vero 4K+",
-    "A proven external-root boot that cannot enumerate internal eMMC",
-    "A readable source-to-binary proof that the deployed removable-boot path performs no pre-kernel internal write",
-    "A pinned cross-toolchain for reproducible ARM64 probe binaries"
+    "Build and prove the official Stremio Service and runtime on OSMC Bullseye armhf",
+    "Select and prove a fullscreen WPE or WebKit kiosk host on OSMC Bullseye armhf",
+    "Complete Stremio stream interception and Kodi display hand-off",
+    "Connect narrow ConnMan BlueZ CEC and OSMC lifecycle adapters",
+    "Review redistribution of a derived full OSMC installer image",
+    "Complete physical Vero playback and cold-boot acceptance"
   ]
 }

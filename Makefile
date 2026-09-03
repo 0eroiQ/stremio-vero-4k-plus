@@ -1,4 +1,9 @@
-.PHONY: check safety sources test preflight fetch-inputs inspect-boot safe-dtb probe-init probe-initramfs boot-probe image
+.PHONY: check safety sources test preflight fetch-inputs stremio-web-source stremio-web-build osmc-base-rootfs osmc-rootfs verify-osmc-rootfs inspect-boot safe-dtb probe-init probe-initramfs boot-probe image
+
+OSMC_IMAGE := .cache/downloads/OSMC_TGT_vero3_20250303.img.gz
+OSMC_ROOTFS := .cache/downloads/OSMC_TGT_vero3_20250303-rootfs.tar.xz
+OSMC_SHA256 := a7736298e5c14f705223d4c9a2b560fdc62e819533acccbc78dad3954de63187
+STREMIO_WEB_COMMIT := 6303c9947967afff70faaa1071171bfd9b4b30d8
 
 check: safety sources test
 
@@ -12,10 +17,41 @@ test:
 	@python3 -m unittest discover -s tests -v
 
 preflight:
-	@python3 scripts/preflight.py --profile aosp
+	@python3 scripts/preflight.py --profile osmc
 
 fetch-inputs:
 	@python3 scripts/fetch_verified.py sources/sources.lock.json
+
+stremio-web-source:
+	@python3 scripts/fetch_git_source.py sources/sources.lock.json \
+	  --name "Stremio Web" --directory stremio-web
+	@python3 scripts/prepare_stremio_web.py \
+	  --source .cache/upstream/stremio-web \
+	  --overlay web-overlay \
+	  --output out/stremio-web-src \
+	  --expected-commit $(STREMIO_WEB_COMMIT)
+
+stremio-web-build: stremio-web-source
+	@cd out/stremio-web-src && corepack pnpm install --frozen-lockfile
+	@cd out/stremio-web-src && corepack pnpm run build
+
+osmc-base-rootfs: fetch-inputs
+	@python3 scripts/extract_osmc_installer.py \
+	  --image-gz $(OSMC_IMAGE) \
+	  --output $(OSMC_ROOTFS) \
+	  --expected-sha256 $(OSMC_SHA256)
+
+osmc-rootfs: osmc-base-rootfs stremio-web-build
+	@python3 scripts/build_osmc_rootfs.py \
+	  --base $(OSMC_ROOTFS) \
+	  --manifest rootfs-overlay/manifest.json \
+	  --output out/rootfs/filesystem.tar.xz
+
+verify-osmc-rootfs:
+	@python3 scripts/verify_osmc_rootfs.py \
+	  --base $(OSMC_ROOTFS) \
+	  --derived out/rootfs/filesystem.tar.xz \
+	  --manifest rootfs-overlay/manifest.json
 
 inspect-boot:
 	@python3 scripts/fetch_verified.py sources/sources.lock.json \
@@ -51,6 +87,6 @@ boot-probe: safe-dtb probe-initramfs
 
 image:
 	@printf '%s\n' \
-	  'IMAGE BUILD BLOCKED: upstream boot/runtime inputs are not locked yet.' \
+	  'IMAGE BUILD BLOCKED: fullscreen shell and playback hand-off are not proven yet.' \
 	  'No disk image was created and no block device was touched.' >&2
 	@exit 2

@@ -1,54 +1,65 @@
-# Verified upstream facts
+# Verified upstream inputs
 
-This record separates verified upstream behavior from project assumptions.
+## OSMC base
 
-## Stremio
+The base input is the final published Vero 4K/4K+ disk image:
 
-- The requested 10-foot UI is the native Android TV application
-  `com.stremio.one`, whose television entry point is
-  `com.stremio.tv.MainActivity`.
-- The official ARM APK is `armeabi-v7a`, requires Android API 24 or newer, and
-  depends on Android Framework, bionic, SurfaceFlinger, and MediaCodec.
-- It cannot run directly in Debian/OSMC armhf Linux.
-- Stremio's open Linux shell is a desktop GTK4/libadwaita/WebKitGTK/libmpv
-  application. It does not provide the same TV interface.
-- Stremio OS for Raspberry Pi is based on LineageOS 21 / Android TV 14 for Pi
-  hardware; it is an architectural reference, not a Vero base image.
+- release: `2025.03-1`
+- file: `OSMC_TGT_vero3_20250303.img.gz`
+- SHA-256: `a7736298e5c14f705223d4c9a2b560fdc62e819533acccbc78dad3954de63187`
+- OSMC-published MD5: `dfa49468c45d90754736de081ea10010`
 
-## Vero 4K+
+The image contains one FAT32 installer partition with `kernel.img`, `dtb.img`
+and `filesystem.tar.xz`. The current builder reads the filesystem archive and
+produces a modified copy. It does not edit the downloaded image in place.
 
-- SoC family: Amlogic Meson GXL S905D, ARMv8/AArch64.
-- OSMC uses a 64-bit kernel with a 32-bit Debian armhf userspace.
-- Current published downstream kernel package is in the 4.9.269 OSMC series.
-- Exact board device tree: `vero3plus_2g_16g` (`gxl_p231_2g`).
-- OSMC does not publish or support an Android/Android TV image for Vero 4K+.
-- The official removable image is destructive installation media, not a live
-  SD system.
+OSMC ended Vero 4K/4K+ support after this final image. Therefore an “OSMC
+update” control must report that lifecycle state honestly and must never switch
+the device to Vero V packages.
 
-## Verified boot hazards
+## Stremio UI and Core
 
-- The pinned official kernel package has `CONFIG_CMDLINE_EXTEND=y` and a
-  compiled internal-root argument. The kernel source appends that text after
-  incoming boot arguments, so a direct external `root=` argument would not be
-  the final root selection.
-- A present initramfs `/init` is executed before the audited kernel prepares a
-  root namespace. The offline probe uses that route and never returns from its
-  storage-blind PID 1.
-- The pinned readable U-Boot recovery source loads a specifically named
-  recovery component and then may clear 4096 bytes of internal `instaboot`
-  before starting Linux.
-- OSMC published a 2024 binary-only bootloader update whose commit message says
-  it fixes that toothpick/`instaboot` problem. The exact currently deployed
-  removable-media path cannot be matched to readable source, so no automatic
-  boot or recovery-media test is authorized.
+The visible UI comes from the official `Stremio/stremio-web` repository. It is
+a React application using `@stremio/stremio-core-web`, so account, add-ons,
+catalogs, Library and watch progress are real Stremio state rather than local
+fixtures.
 
-## Still unproven
+The source is pinned to a full commit in `sources/sources.lock.json`. Our
+overlay modifies the existing Settings route and preserves the upstream
+copyright notice. The resulting combined work is distributed under GPL-2.0.
 
-- A stable Android boot on the exact Vero 4K+ board.
-- A complete distributable graphics/codec/audio HAL stack.
-- Hardware video decode usable by the official Stremio TV players.
-- HDR metadata, refresh-rate switching, HDMI passthrough, CEC, RF remote,
-  Wi-Fi, and Bluetooth in the new runtime.
-- An external-root boot path that leaves internal storage unreachable.
-- A read-only audit of the exact deployed bootloader environment and a
-  pre-kernel path proven not to write internal storage.
+The official Linux shell is retained as an architecture reference only. Its
+GTK4/libadwaita/WebKitGTK/libmpv desktop shell is not automatically suitable
+for a Vero television appliance. The kiosk host remains an explicit build and
+hardware-compatibility gate.
+
+## Stremio Service
+
+The official `Stremio/stremio-service` source is pinned separately. The web UI
+can compile without it, but a self-contained Vero appliance still needs the
+service for torrent and local streaming behavior. Upstream publishes an amd64
+Debian package; this project must build and validate its Rust service and
+bundled runtime for OSMC Bullseye armhf before claiming a complete Stremio
+system.
+
+## Kodi settings provenance
+
+The bridge mapping is limited to setting IDs and enum values found in:
+
+`usr/share/kodi/system/settings/settings.xml`
+
+inside the pinned OSMC root filesystem. The initial mapping covers:
+
+- `videoplayer.adjustrefreshrate`
+- `videoplayer.usedisplayasclock`
+- `videoplayer.useamcodec`
+- `videoplayer.amlhdrmodes`
+- `audiooutput.channels`
+- `audiooutput.passthrough`
+- AC3, E-AC3, DTS, TrueHD and DTS-HD passthrough toggles
+- preferred audio/subtitle language and basic subtitle rendering
+
+Runtime application uses Kodi JSON-RPC `Settings.GetSettings`,
+`Settings.GetSettingValue` and `Settings.SetSettingValue`. The bridge first
+discovers available setting IDs and skips unavailable ones with an explicit
+status instead of modifying Kodi XML files directly.

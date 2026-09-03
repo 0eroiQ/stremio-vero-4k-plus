@@ -14,7 +14,7 @@ import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CACHE = ROOT / ".cache" / "downloads"
-ALLOWED_HOSTS = {"apt.osmc.tv", "dl.strem.io"}
+ALLOWED_HOSTS = {"apt.osmc.tv", "dl.strem.io", "ftp.fau.de"}
 
 
 def digest(path: pathlib.Path) -> str:
@@ -81,4 +81,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

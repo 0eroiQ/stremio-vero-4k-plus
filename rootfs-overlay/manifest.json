@@ -1,0 +1,51 @@
+{
+  "files": [
+    {
+      "source": "runtime/settings_bridge/bridge.py",
+      "target": "usr/lib/stremio-vero/settings-bridge.py",
+      "mode": "0755"
+    },
+    {
+      "source": "runtime/settings_bridge/default-settings.json",
+      "target": "usr/share/stremio-vero/default-settings.json",
+      "mode": "0644"
+    },
+    {
+      "source": "rootfs-overlay/stremio-vero-settings.service",
+      "target": "etc/systemd/system/stremio-vero-settings.service",
+      "mode": "0644"
+    },
+    {
+      "source": "runtime/web_server/server.py",
+      "target": "usr/lib/stremio-vero/web-server.py",
+      "mode": "0755"
+    },
+    {
+      "source": "rootfs-overlay/stremio-vero-web.service",
+      "target": "etc/systemd/system/stremio-vero-web.service",
+      "mode": "0644"
+    },
+    {
+      "source": "rootfs-overlay/image-release",
+      "target": "etc/stremio-vero/image-release",
+      "mode": "0644"
+    }
+  ],
+  "trees": [
+    {
+      "source": "out/stremio-web-src/build",
+      "target": "usr/share/stremio-vero/web",
+      "fileMode": "0644"
+    }
+  ],
+  "symlinks": [
+    {
+      "target": "etc/systemd/system/multi-user.target.wants/stremio-vero-settings.service",
+      "link": "../stremio-vero-settings.service"
+    },
+    {
+      "target": "etc/systemd/system/multi-user.target.wants/stremio-vero-web.service",
+      "link": "../stremio-vero-web.service"
+    }
+  ]
+}

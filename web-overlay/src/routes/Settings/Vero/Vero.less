@@ -1,0 +1,28 @@
+.status {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 2rem;
+    color: var(--secondary-foreground-color);
+
+    .online, .offline {
+        width: 0.65rem;
+        height: 0.65rem;
+        border-radius: 50%;
+    }
+
+    .online {
+        background: #45d17a;
+    }
+
+    .offline {
+        background: #e45c67;
+    }
+}
+
+.pending {
+    color: var(--secondary-foreground-color);
+    line-height: 1.5rem;
+    opacity: 0.7;
+}

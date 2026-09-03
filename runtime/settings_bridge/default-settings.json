@@ -1,0 +1,29 @@
+{
+  "audio": {
+    "ac3": true,
+    "channels": "2.0",
+    "dts": false,
+    "dtshd": false,
+    "eac3": false,
+    "passthrough": false,
+    "preferredLanguage": "original",
+    "truehd": false
+  },
+  "device": {
+    "automaticUpdates": false,
+    "cecEnabled": true
+  },
+  "picture": {
+    "adjustRefreshRate": "startStop",
+    "hardwareDecoding": true,
+    "hdrMode": "auto",
+    "syncPlaybackToDisplay": false
+  },
+  "subtitles": {
+    "backgroundColor": "FF000000",
+    "fontSize": 42,
+    "preferredLanguage": "original",
+    "textColor": "FFFFFFFF",
+    "verticalMargin": 4.95
+  }
+}

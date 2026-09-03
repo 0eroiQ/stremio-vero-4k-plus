@@ -1,0 +1,21 @@
+[Unit]
+Description=Stremio for Vero local settings bridge
+After=network.target
+
+[Service]
+Type=simple
+User=osmc
+Group=osmc
+StateDirectory=stremio-vero
+ExecStart=/usr/bin/python3 /usr/lib/stremio-vero/settings-bridge.py --state /var/lib/stremio-vero/settings.json
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/stremio-vero
+RestrictAddressFamilies=AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

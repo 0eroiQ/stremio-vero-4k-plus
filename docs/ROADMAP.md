@@ -1,42 +1,47 @@
 # Roadmap
 
-## Phase 0 — source and recovery proof
+## Phase 0 — reproducible OSMC overlay
 
-- Create the public project and continuous safety checks.
-- Reproduce and inspect an all-entry eMMC-disabled Vero multi-DTB offline.
-- Build a deterministic storage-blind initramfs and guarded boot component in
-  CI. Physical boot remains prohibited and untested.
-- Audit the exact deployed removable-boot route and prove it cannot write to
-  internal storage before Linux starts.
-- Pin exact upstream Vero sources and document their licenses.
-- Resolve the official Stremio TV runtime and redistribution path.
-- Document exact-model OSMC recovery without running it.
+- [x] Pin and verify OSMC 2025.03-1 and official Stremio Web source.
+- [x] Add Vero Settings to the real Stremio Settings route.
+- [x] Build and unit-test the localhost Settings Bridge and Kodi mapping.
+- [x] Build and serve the production Stremio Web bundle on loopback.
+- [x] Transform `filesystem.tar.xz` as a regular file and publish a manifest.
+- [x] Keep all device-writing commands prohibited.
+- [ ] Reproduce the final archive checksum in a clean build environment.
 
-Exit condition: `sources.lock.json` is complete and marked `locked`.
+Exit condition: the patched Stremio source and transformed OSMC rootfs build
+twice with identical content and all offline checks pass.
 
-## Phase 1 — offline build
+## Phase 1 — kiosk and playback hand-off
 
-- Build the kernel/runtime in a pinned Linux container.
-- Assemble an external-only image as a regular file.
-- Generate partition manifest, SBOM, licenses, and SHA-256 checksums.
+- Build and prove the official Stremio Service on OSMC Bullseye armhf.
+- Select the smallest compatible WPE/WebKit shell for OSMC Bullseye armhf.
+- Prove fullscreen rendering and RF/CEC D-pad input on a non-Vero test target.
+- Implement the Stremio-to-Kodi playback request and DRM display hand-off.
+- Apply queued settings through Kodi JSON-RPC before playback.
+- Return progress, pause, seek, stop and completion to Stremio Core.
+
+Exit condition: a desktop/Linux integration test plays a URL through Kodi and
+returns to Stremio without showing Kodi Home.
+
+## Phase 2 — derived installer image
+
+- Repack the modified rootfs into a copy of the official OSMC installer image.
+- Add SBOM, license notices, file manifest and full checksums.
 - Mount and inspect every filesystem offline.
+- Confirm the bootloader, kernel and DTB are byte-identical to official OSMC.
+- Prepare official recovery media and rollback instructions.
 
-Exit condition: CI and local verification pass with no device-writing code.
+Exit condition: reviewed image exists as a file, with no physical write.
 
-## Phase 2 — guarded Vero bring-up
+## Phase 3 — guarded Vero acceptance
 
-- HDMI signal and stable boot.
-- USB/RF remote and HDMI-CEC navigation.
-- Ethernet, Wi-Fi, Bluetooth, and Vero Settings.
-- Stremio account and catalog synchronization.
-- 1080p, then 4K HEVC Main10, HDR, refresh rate, and HDMI passthrough.
+- First boot, HDMI and stable Stremio navigation.
+- RF remote and HDMI-CEC.
+- Ethernet, Wi-Fi and Bluetooth through Vero Settings.
+- 1080p before 4K HEVC Main10, HDR and refresh-rate switching.
+- Stereo before passthrough codec tests.
+- Cold boot, reboot, power loss and recovery acceptance.
 
-Exit condition: recorded acceptance evidence for every feature.
-
-## Phase 3 — user-installable release
-
-- Publish the reviewed external image and checksums.
-- Provide a removable-media writer that requires explicit drive selection and
-  destructive confirmation.
-- Keep internal installation disabled until a separate recovery and rollback
-  design is proven.
+Exit condition: recorded evidence for every feature and a normal cold boot.
