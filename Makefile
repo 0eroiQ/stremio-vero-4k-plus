@@ -80,7 +80,7 @@ osmc-base-rootfs: fetch-inputs
 	  --output $(OSMC_ROOTFS) \
 	  --expected-sha256 $(OSMC_SHA256)
 
-osmc-rootfs: osmc-base-rootfs stremio-web-build
+osmc-rootfs: osmc-base-rootfs stremio-web-build stremio-service-runtime
 	@python3 scripts/build_osmc_rootfs.py \
 	  --base $(OSMC_ROOTFS) \
 	  --manifest rootfs-overlay/manifest.json \

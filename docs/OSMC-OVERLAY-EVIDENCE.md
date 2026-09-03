@@ -29,3 +29,35 @@ The rootfs verifier compared every original archive entry:
 - Kodi autostart override present: no
 
 No Vero, eMMC, SD card or USB drive was accessed by this build.
+
+## 2026-09-03 — inactive ARM Stremio Service payload
+
+- Stremio Service source commit:
+  `1891799734acba88904f9f62cb8ca491873b36fb`
+- Stremio Server 4.21.1 SHA-256:
+  `405eb494d6708406a30e716c3cfb5abae7a5e9c7a8b79446d64c3f821385930f`
+- Node.js 18.12.1 Linux armv7l archive SHA-256:
+  `d0131a764c0f44821fdacb3c3ab8b35b52af060a98ac7a150ec49d4c540be3d7`
+- FFmpeg 4.4.1 static armhf archive SHA-256:
+  `42069b3e7289acf9772ed651f56fe13a53274165db55d005444a1bc1551cdd2f`
+- GitHub ARM smoke run:
+  `https://github.com/0eroiQ/stremio-vero-4k-plus/actions/runs/33723607014`
+
+The ARM job executed Node.js, FFmpeg and ffprobe under QEMU, started the exact
+Stremio Server bundle, and received HTTP 200 from `127.0.0.1:11470`. Casting
+discovery was disabled because QEMU user networking does not provide the
+multicast socket operation used by the server. No stream or video playback was
+claimed by this test.
+
+The verified runtime was then added to a new derived rootfs as an inactive
+payload. There is no Stremio Service systemd unit or autostart link yet:
+
+- final derived rootfs SHA-256:
+  `1e04bd683f1618691123464e27f33333ad308de59acf9b035addce22d9758396`
+- original OSMC entries: 40,574
+- byte-and-metadata-identical original entries: 40,574
+- declared overlay entries: 117
+- undeclared changes: 0
+- Kodi autostart override present: no
+
+No Vero, eMMC, SD card or USB drive was accessed by this build.

@@ -21,15 +21,41 @@ ALLOWED_REPOSITORIES = {
 
 
 def run(*args: str, cwd: Path | None = None) -> str:
-    result = subprocess.run(
-        args,
-        cwd=cwd,
-        check=True,
-        text=True,
+    try:
+        result = subprocess.run(
+            args,
+            cwd=cwd,
+            check=True,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+    except subprocess.CalledProcessError as error:
+        detail = (error.stderr or error.stdout or "").strip()
+        raise RuntimeError(f"command failed: {' '.join(args)}: {detail}") from error
+    return result.stdout.strip()
+
+
+def verify_clean_checkout(destination: Path) -> None:
+    tracked = subprocess.run(
+        (
+            "git",
+            "-c",
+            "core.trustctime=false",
+            "diff-index",
+            "--quiet",
+            "HEAD",
+            "--",
+        ),
+        cwd=destination,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
-    return result.stdout.strip()
+    if tracked.returncode != 0:
+        raise ValueError(f"cached source contains a modified or deleted file: {destination}")
+    untracked = run("git", "ls-files", "--others", "--exclude-standard", cwd=destination)
+    if untracked:
+        raise ValueError(f"cached source contains an untracked file: {untracked.splitlines()[0]}")
 
 
 def source_for_name(lock: Path, name: str) -> dict[str, str]:
@@ -62,6 +88,12 @@ def fetch(source: dict[str, str], destination: Path) -> None:
         raise SystemExit(f"cached origin does not match source lock: {destination}")
 
     revision = source["revision"]
+    actual = run("git", "rev-parse", "HEAD", cwd=destination)
+    if actual == revision:
+        verify_clean_checkout(destination)
+        print(f"verified cached Git source: {source['name']} @ {actual}")
+        return
+
     run("git", "fetch", "--depth=1", "origin", revision, cwd=destination)
     run("git", "switch", "--detach", revision, cwd=destination)
     actual = run("git", "rev-parse", "HEAD", cwd=destination)

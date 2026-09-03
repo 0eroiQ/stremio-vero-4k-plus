@@ -4,6 +4,7 @@ import importlib.util
 import gzip
 import json
 import pathlib
+import subprocess
 import struct
 import tempfile
 import unittest
@@ -127,6 +128,64 @@ class FetchSafetyTests(unittest.TestCase):
                 self.fetch.digest(path),
                 "4238de9419224e8813579ab4be59d04a09d3951f030beb87413828d66ed36e05",
             )
+
+
+class GitSourceCacheTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.fetch = load_script("fetch_git_source")
+
+    def test_cached_checkout_is_verified_without_network(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repository = pathlib.Path(directory)
+            tracked = repository / "tracked.txt"
+            subprocess.run(("git", "init", "--quiet"), cwd=repository, check=True)
+            tracked.write_text("official\n", encoding="utf-8")
+            subprocess.run(("git", "add", "tracked.txt"), cwd=repository, check=True)
+            subprocess.run(
+                (
+                    "git",
+                    "-c",
+                    "user.name=Test",
+                    "-c",
+                    "user.email=test@example.invalid",
+                    "commit",
+                    "--quiet",
+                    "-m",
+                    "fixture",
+                ),
+                cwd=repository,
+                check=True,
+            )
+            self.fetch.verify_clean_checkout(repository)
+            tracked.write_text("modified\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "modified or deleted file"):
+                self.fetch.verify_clean_checkout(repository)
+
+    def test_cached_checkout_rejects_untracked_files(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repository = pathlib.Path(directory)
+            subprocess.run(("git", "init", "--quiet"), cwd=repository, check=True)
+            (repository / "tracked.txt").write_text("official\n", encoding="utf-8")
+            subprocess.run(("git", "add", "tracked.txt"), cwd=repository, check=True)
+            subprocess.run(
+                (
+                    "git",
+                    "-c",
+                    "user.name=Test",
+                    "-c",
+                    "user.email=test@example.invalid",
+                    "commit",
+                    "--quiet",
+                    "-m",
+                    "fixture",
+                ),
+                cwd=repository,
+                check=True,
+            )
+            (repository / "extra.txt").write_text("extra\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "untracked file"):
+                self.fetch.verify_clean_checkout(repository)
 
 
 class StremioServiceRuntimeTests(unittest.TestCase):

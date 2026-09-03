@@ -51,9 +51,9 @@ the matching official Node.js 18.12.1 Linux ARMv7 hard-float runtime beneath
 
 The output includes pinned static ARM builds of FFmpeg 4.4.1 and ffprobe from
 the same release family embedded by upstream Stremio Service. It is not added
-to the rootfs yet and deliberately reports `imageEligible: false`. CI executes
-Node, FFmpeg and ffprobe and starts the server under QEMU; this proves ARM
-startup compatibility, not media playback or Vero hardware integration.
+to any startup target and deliberately reports `imageEligible: false`. CI
+executes Node, FFmpeg and ffprobe and starts the server under QEMU; this proves
+ARM startup compatibility, not media playback or Vero hardware integration.
 
 ## 4. Build the OSMC rootfs overlay
 
@@ -69,10 +69,12 @@ The steps are deliberately explicit:
    attaching or mounting it;
 4. extract and validate `filesystem.tar.xz`;
 5. stream the official archive into a new archive while adding the local-only
-   settings bridge and its systemd service; and
+   settings bridge, Stremio Web build and the inactive ARM service payload; and
 6. write a JSON build report with the base and output checksums.
 
-The current overlay does **not** disable OSMC's Kodi startup. That switch would
+The ARM Stremio Service payload is present for offline verification but has no
+systemd unit or autostart link yet. The current overlay also does **not**
+disable OSMC's Kodi startup. That switch would
 leave a black screen until the fullscreen Stremio shell and display hand-off
 are packaged and tested, so it remains a later gated change.
 

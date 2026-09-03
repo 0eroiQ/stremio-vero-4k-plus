@@ -55,7 +55,7 @@ def audit(upstream: Path, prepared: Path) -> dict[str, object]:
         "upstreamExecutables": upstream_details,
         "preparedExecutables": prepared_details,
         "preparedRuntimeImageEligible": prepared_manifest["imageEligible"],
-        "remainingBlockers": prepared_manifest["remainingBlockers"],
+        "requiredExternalValidations": prepared_manifest["requiredExternalValidations"],
     }
     print(json.dumps(report, indent=2, sort_keys=True))
     return report

@@ -194,7 +194,7 @@ def prepare(
         "upstreamLinuxBundleAccepted": False,
         "upstreamLinuxBundleReason": "official bundled executables are x86-64",
         "imageEligible": False,
-        "remainingBlockers": [
+        "requiredExternalValidations": [
             "ARM service and media-tool smoke test",
             "Vero playback integration test",
         ],

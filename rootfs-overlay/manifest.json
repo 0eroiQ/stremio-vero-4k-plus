@@ -29,6 +29,41 @@
       "source": "rootfs-overlay/image-release",
       "target": "etc/stremio-vero/image-release",
       "mode": "0644"
+    },
+    {
+      "source": "out/stremio-service-armhf/stremio-runtime",
+      "target": "usr/lib/stremio-vero/service/stremio-runtime",
+      "mode": "0755"
+    },
+    {
+      "source": "out/stremio-service-armhf/ffmpeg",
+      "target": "usr/lib/stremio-vero/service/ffmpeg",
+      "mode": "0755"
+    },
+    {
+      "source": "out/stremio-service-armhf/ffprobe",
+      "target": "usr/lib/stremio-vero/service/ffprobe",
+      "mode": "0755"
+    },
+    {
+      "source": "out/stremio-service-armhf/server.js",
+      "target": "usr/share/stremio-vero/service/server.js",
+      "mode": "0644"
+    },
+    {
+      "source": "out/stremio-service-armhf/LICENSE.node",
+      "target": "usr/share/doc/stremio-vero/LICENSE.node",
+      "mode": "0644"
+    },
+    {
+      "source": "out/stremio-service-armhf/LICENSE.ffmpeg",
+      "target": "usr/share/doc/stremio-vero/LICENSE.ffmpeg",
+      "mode": "0644"
+    },
+    {
+      "source": "out/stremio-service-armhf/runtime-manifest.json",
+      "target": "usr/share/doc/stremio-vero/stremio-service-runtime.json",
+      "mode": "0644"
     }
   ],
   "trees": [

@@ -103,7 +103,7 @@
     }
   ],
   "unresolved": [
-    "Complete the Stremio Service ARM media-tool smoke test and Vero integration test",
+    "Complete physical Vero integration for the ARM Stremio Service and media tools",
     "Select and prove a fullscreen WPE or WebKit kiosk host on OSMC Bullseye armhf",
     "Complete Stremio stream interception and Kodi display hand-off",
     "Connect narrow ConnMan BlueZ CEC and OSMC lifecycle adapters",

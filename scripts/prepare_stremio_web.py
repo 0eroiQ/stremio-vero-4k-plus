@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -36,8 +38,28 @@ def digest(path: Path) -> str:
     return result.hexdigest()
 
 
-def ignored(_directory: str, names: list[str]) -> set[str]:
-    return {name for name in names if name in IGNORED_SOURCE_PARTS}
+def copy_source(source: Path, output: Path) -> None:
+    jobs: list[tuple[Path, Path]] = []
+    for directory, names, files in os.walk(source):
+        names[:] = [name for name in names if name not in IGNORED_SOURCE_PARTS]
+        source_directory = Path(directory)
+        relative = source_directory.relative_to(source)
+        target_directory = output / relative
+        target_directory.mkdir(parents=True, exist_ok=True)
+        for name in files:
+            if name in IGNORED_SOURCE_PARTS:
+                continue
+            jobs.append((source_directory / name, target_directory / name))
+
+    def copy_one(job: tuple[Path, Path]) -> None:
+        source_path, target_path = job
+        if source_path.is_symlink():
+            target_path.symlink_to(os.readlink(source_path))
+        else:
+            shutil.copy2(source_path, target_path)
+
+    with ThreadPoolExecutor(max_workers=min(16, max(1, len(jobs)))) as executor:
+        list(executor.map(copy_one, jobs))
 
 
 def prepare(source: Path, overlay: Path, output: Path, revision: str) -> None:
@@ -50,7 +72,7 @@ def prepare(source: Path, overlay: Path, output: Path, revision: str) -> None:
     if output.exists():
         shutil.rmtree(output)
 
-    shutil.copytree(source, output, ignore=ignored, symlinks=True)
+    copy_source(source, output)
     overlay_files: list[dict[str, str]] = []
     for source_path in sorted(path for path in overlay.rglob("*") if path.is_file()):
         relative = source_path.relative_to(overlay)

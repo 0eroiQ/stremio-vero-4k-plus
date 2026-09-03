@@ -18,8 +18,10 @@ twice with identical content and all offline checks pass.
 - [x] Reject the official Stremio Service x86-64 Linux runtime from Vero builds.
 - [x] Prepare the official Stremio Server with a matching Node.js ARMv7 runtime.
 - [x] Prove service startup under ARM emulation.
-- Prepare and execute compatible static ARM `ffmpeg`/`ffprobe` before adding
-  the service to the rootfs.
+- [x] Prepare and execute compatible static ARM `ffmpeg`/`ffprobe`.
+- [x] Add the verified but inactive service payload to the derived rootfs.
+- Define its restricted OSMC service unit only after the local-data and network
+  contract is tested.
 - Select the smallest compatible WPE/WebKit shell for OSMC Bullseye armhf.
 - Prove fullscreen rendering and RF/CEC D-pad input on a non-Vero test target.
 - Implement the Stremio-to-Kodi playback request and DRM display hand-off.
