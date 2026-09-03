@@ -60,6 +60,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes --no-install-recommends \
             libc6-armhf-cross \
+            libatomic1-armhf-cross \
             libstdc++6-armhf-cross \
             qemu-user-static=1:8.2.2+ds-0ubuntu1.18
       - name: Start the official server on the ARM runtime
