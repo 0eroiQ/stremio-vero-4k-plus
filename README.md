@@ -33,14 +33,17 @@ already provides the proven AMCodec, refresh-rate, HDR and HDMI-audio support.
 - A localhost-only settings service validates and persists the choices and
   translates them to the exact Kodi 21 setting IDs shipped in the OSMC image.
 - A loopback-only web service serves the production Stremio bundle locally.
+- The official Stremio Server JavaScript runs with verified ARMv7 Node.js,
+  FFmpeg and ffprobe binaries. Its restricted OSMC service unit is packaged but
+  deliberately not enabled at boot.
 - An allowlisted root-filesystem transformer applies the project overlay to
   OSMC's `filesystem.tar.xz` without mounting or modifying the source image.
 - Safety checks reject block-device writers and direct eMMC modification code.
 
 ## Still required before hardware testing
 
-- Build and package the official Stremio Service and its runtime for OSMC's
-  armhf userspace so torrent and local streaming work without a desktop.
+- Prove the packaged Stremio Service on Vero hardware and decide whether port
+  11470 remains available to the home network or is isolated behind a proxy.
 - Select and package a lightweight fullscreen WebKit/WPE shell that can use
   Vero's display stack and D-pad input.
 - Complete the display hand-off: stop the Stremio shell, start hidden Kodi with

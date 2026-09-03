@@ -17,13 +17,17 @@ and shell integration.
    armhf userspace.
 2. **Stremio kiosk shell** — a fullscreen WebKit/WPE host for the pinned
    official Stremio Web build, with D-pad navigation and no desktop.
-3. **Settings Bridge** — a localhost-only API. It queues validated settings,
+3. **Stremio Service** — the official Server JavaScript on a verified ARMv7
+   Node.js runtime with matching ARM FFmpeg tools. Its state and cache are
+   isolated from the immutable application files. The packaged unit remains
+   disabled until its port-11470 network policy is tested.
+4. **Settings Bridge** — a localhost-only API. It queues validated settings,
    maps supported values to Kodi JSON-RPC, and later exposes narrow ConnMan,
    BlueZ, CEC and updater operations.
-4. **Playback Bridge** — accepts a resolved Stremio stream, suspends the kiosk
+5. **Playback Bridge** — accepts a resolved Stremio stream, suspends the kiosk
    display, starts Kodi directly in playback, synchronizes state and progress,
    stops Kodi when playback finishes, and restores Stremio.
-5. **Kodi VideoPlayer** — retained as the Vero hardware playback engine. Kodi
+6. **Kodi VideoPlayer** — retained as the Vero hardware playback engine. Kodi
    Home, Estuary and Kodi Settings are not part of the normal user experience.
 
 ## Display ownership

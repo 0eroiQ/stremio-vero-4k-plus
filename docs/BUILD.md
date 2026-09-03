@@ -72,9 +72,16 @@ The steps are deliberately explicit:
    settings bridge, Stremio Web build and the inactive ARM service payload; and
 6. write a JSON build report with the base and output checksums.
 
-The ARM Stremio Service payload is present for offline verification but has no
-systemd unit or autostart link yet. The current overlay also does **not**
-disable OSMC's Kodi startup. That switch would
+The ARM Stremio Service payload and a restricted systemd unit are present for
+offline verification. The unit keeps its state beneath
+`/var/lib/stremio-vero/service`, its two-gigabyte default cache beneath
+`/var/cache/stremio-vero/service`, disables casting discovery and points its UI
+at the local Stremio Web service. It deliberately has no autostart link.
+
+The official server still binds port 11470 on the available interfaces. A
+physical-network policy or loopback proxy must be selected and tested before
+the unit can be enabled. The current overlay also does **not** disable OSMC's
+Kodi startup. That switch would
 leave a black screen until the fullscreen Stremio shell and display hand-off
 are packaged and tested, so it remains a later gated change.
 

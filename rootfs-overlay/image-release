@@ -1,6 +1,7 @@
 PRETTY_NAME="Stremio for Vero 4K+ development overlay"
 BASE_OSMC_VERSION="2025.03-1"
-STAGE="web-and-settings-overlay"
+STAGE="web-settings-and-inactive-service-overlay"
 STREMIO_WEB_COMMIT="6303c9947967afff70faaa1071171bfd9b4b30d8"
+STREMIO_SERVICE_AUTOSTART="no"
 KODI_AUTOSTART_CHANGED="no"
 INTERNAL_INSTALL_SUPPORTED="no"

@@ -64,6 +64,21 @@
       "source": "out/stremio-service-armhf/runtime-manifest.json",
       "target": "usr/share/doc/stremio-vero/stremio-service-runtime.json",
       "mode": "0644"
+    },
+    {
+      "source": "runtime/stremio_service/launcher.py",
+      "target": "usr/lib/stremio-vero/service-launcher.py",
+      "mode": "0755"
+    },
+    {
+      "source": "runtime/stremio_service/default-server-settings.json",
+      "target": "usr/share/stremio-vero/service/default-server-settings.json",
+      "mode": "0644"
+    },
+    {
+      "source": "rootfs-overlay/stremio-vero-service.service",
+      "target": "etc/systemd/system/stremio-vero-service.service",
+      "mode": "0644"
     }
   ],
   "trees": [

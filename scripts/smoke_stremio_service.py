@@ -9,6 +9,8 @@ import os
 from pathlib import Path
 import socket
 import subprocess
+import sys
+import tempfile
 import time
 import urllib.error
 import urllib.request
@@ -54,24 +56,18 @@ def smoke(
     server: Path,
     ffmpeg: Path,
     ffprobe: Path,
+    launcher: Path,
+    defaults: Path,
     emulator: Path,
     sysroot: Path,
 ) -> dict[str, object]:
-    for path in (runtime, server, ffmpeg, ffprobe, emulator):
+    for path in (runtime, server, ffmpeg, ffprobe, launcher, defaults, emulator):
         if not path.is_file():
             raise ValueError(f"required input is missing: {path}")
     if not sysroot.is_dir():
         raise ValueError(f"ARM sysroot is missing: {sysroot}")
 
     environment = os.environ.copy()
-    environment.update(
-        {
-            "CASTING_DISABLED": "1",
-            "FFMPEG_BIN": "/bin/false",
-            "FFPROBE_BIN": "/bin/false",
-            "NO_HTTPS_SERVER": "1",
-        }
-    )
     prefix = [str(emulator), "-L", str(sysroot), str(runtime)]
     version_probe = subprocess.run(
         [*prefix, "--version"],
@@ -91,35 +87,63 @@ def smoke(
     ffmpeg_version = execute_version(emulator, ffmpeg, "ffmpeg version 4.4.1-static")
     ffprobe_version = execute_version(emulator, ffprobe, "ffprobe version 4.4.1-static")
 
-    environment["FFMPEG_BIN"] = str(ffmpeg.resolve())
-    environment["FFPROBE_BIN"] = str(ffprobe.resolve())
-
-    command = [*prefix, str(server)]
-    process = subprocess.Popen(
-        command,
-        env=environment,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-    failure: BaseException | None = None
-    status: int | None = None
-    try:
-        status = wait_for_http(process, 20)
-    except BaseException as error:
-        failure = error
-    finally:
-        if process.poll() is None:
-            process.terminate()
+    with tempfile.TemporaryDirectory() as directory:
+        temporary = Path(directory)
+        state = temporary / "state"
+        cache = temporary / "cache"
+        command = [
+            sys.executable,
+            str(launcher.resolve()),
+            "--runtime",
+            str(runtime.resolve()),
+            "--server",
+            str(server.resolve()),
+            "--ffmpeg",
+            str(ffmpeg.resolve()),
+            "--ffprobe",
+            str(ffprobe.resolve()),
+            "--defaults",
+            str(defaults.resolve()),
+            "--state",
+            str(state),
+            "--cache",
+            str(cache),
+            "--emulator",
+            str(emulator.resolve()),
+            "--sysroot",
+            str(sysroot.resolve()),
+        ]
+        process = subprocess.Popen(
+            command,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+        failure: BaseException | None = None
+        status: int | None = None
         try:
-            output = process.communicate(timeout=5)[0]
-        except subprocess.TimeoutExpired:
-            process.kill()
-            output = process.communicate(timeout=5)[0]
-    decoded_output = output.decode("utf-8", "replace")
-    if failure is not None:
-        raise RuntimeError(f"{failure}; service output: {decoded_output[-4000:]}") from failure
-    if status is None:
-        raise RuntimeError("service probe completed without an HTTP status")
+            status = wait_for_http(process, 20)
+        except BaseException as error:
+            failure = error
+        finally:
+            if process.poll() is None:
+                process.terminate()
+            try:
+                output = process.communicate(timeout=5)[0]
+            except subprocess.TimeoutExpired:
+                process.kill()
+                output = process.communicate(timeout=5)[0]
+        decoded_output = output.decode("utf-8", "replace")
+        if failure is not None:
+            raise RuntimeError(
+                f"{failure}; service output: {decoded_output[-4000:]}"
+            ) from failure
+        if status is None:
+            raise RuntimeError("service probe completed without an HTTP status")
+        settings_path = state / "server-settings.json"
+        settings = json.loads(settings_path.read_text(encoding="utf-8"))
+        if settings.get("cacheRoot") != str(cache):
+            raise RuntimeError("launcher did not assign the isolated cache directory")
 
     report = {
         "armRuntimeExecuted": True,
@@ -129,6 +153,7 @@ def smoke(
         "serverPort": 11470,
         "httpStatus": status,
         "mediaToolsExecuted": True,
+        "launcherStateInitialized": True,
         "scope": "startup and version probes only; no streaming or playback",
         "logTail": decoded_output[-2000:],
     }
@@ -142,6 +167,8 @@ def main() -> None:
     parser.add_argument("--server", type=Path, required=True)
     parser.add_argument("--ffmpeg", type=Path, required=True)
     parser.add_argument("--ffprobe", type=Path, required=True)
+    parser.add_argument("--launcher", type=Path, required=True)
+    parser.add_argument("--defaults", type=Path, required=True)
     parser.add_argument("--emulator", type=Path, required=True)
     parser.add_argument("--sysroot", type=Path, required=True)
     args = parser.parse_args()
@@ -150,6 +177,8 @@ def main() -> None:
         args.server,
         args.ffmpeg,
         args.ffprobe,
+        args.launcher,
+        args.defaults,
         args.emulator,
         args.sysroot,
     )

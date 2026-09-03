@@ -20,8 +20,9 @@ twice with identical content and all offline checks pass.
 - [x] Prove service startup under ARM emulation.
 - [x] Prepare and execute compatible static ARM `ffmpeg`/`ffprobe`.
 - [x] Add the verified but inactive service payload to the derived rootfs.
-- Define its restricted OSMC service unit only after the local-data and network
-  contract is tested.
+- [x] Package a restricted OSMC service unit with private state and cache.
+- Keep the service disabled until port 11470 exposure and the physical Vero
+  data-path test are resolved.
 - Select the smallest compatible WPE/WebKit shell for OSMC Bullseye armhf.
 - Prove fullscreen rendering and RF/CEC D-pad input on a non-Vero test target.
 - Implement the Stremio-to-Kodi playback request and DRM display hand-off.

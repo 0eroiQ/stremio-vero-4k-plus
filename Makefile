@@ -4,6 +4,7 @@ OSMC_IMAGE := .cache/downloads/OSMC_TGT_vero3_20250303.img.gz
 OSMC_ROOTFS := .cache/downloads/OSMC_TGT_vero3_20250303-rootfs.tar.xz
 OSMC_SHA256 := a7736298e5c14f705223d4c9a2b560fdc62e819533acccbc78dad3954de63187
 STREMIO_WEB_COMMIT := 6303c9947967afff70faaa1071171bfd9b4b30d8
+STREMIO_WEB_GIT_DIR := $(abspath .cache/upstream/stremio-web/.git)
 STREMIO_SERVER_SHA256 := 405eb494d6708406a30e716c3cfb5abae7a5e9c7a8b79446d64c3f821385930f
 NODE_ARMHF_SHA256 := d0131a764c0f44821fdacb3c3ab8b35b52af060a98ac7a150ec49d4c540be3d7
 FFMPEG_ARMHF_SHA256 := 42069b3e7289acf9772ed651f56fe13a53274165db55d005444a1bc1551cdd2f
@@ -38,7 +39,10 @@ stremio-web-source:
 
 stremio-web-build: stremio-web-source
 	@cd out/stremio-web-src && corepack pnpm install --frozen-lockfile
-	@cd out/stremio-web-src && corepack pnpm run build
+	@cd out/stremio-web-src && GIT_DIR="$(STREMIO_WEB_GIT_DIR)" corepack pnpm run build
+	@python3 scripts/verify_stremio_web_build.py \
+	  --build out/stremio-web-src/build \
+	  --expected-commit $(STREMIO_WEB_COMMIT)
 
 stremio-service-source:
 	@python3 scripts/fetch_git_source.py sources/sources.lock.json \
@@ -71,6 +75,8 @@ stremio-service-smoke: stremio-service-runtime
 	  --server out/stremio-service-armhf/server.js \
 	  --ffmpeg out/stremio-service-armhf/ffmpeg \
 	  --ffprobe out/stremio-service-armhf/ffprobe \
+	  --launcher runtime/stremio_service/launcher.py \
+	  --defaults runtime/stremio_service/default-server-settings.json \
 	  --emulator $(QEMU_ARM) \
 	  --sysroot $(ARM_SYSROOT)
 

@@ -61,3 +61,33 @@ payload. There is no Stremio Service systemd unit or autostart link yet:
 - Kodi autostart override present: no
 
 No Vero, eMMC, SD card or USB drive was accessed by this build.
+
+## 2026-09-03 — packaged but disabled Stremio Service unit
+
+The derived rootfs now contains a restricted systemd service definition and a
+small launcher for the verified ARM runtime. The launcher creates mode-0700
+state and cache directories, creates initial server settings without
+overwriting an existing file, rejects a settings symlink, selects the packaged
+FFmpeg tools and points the server at the local official Stremio Web build.
+
+The service is deliberately **not** linked into an OSMC boot target. Casting
+discovery is disabled. The official server's port-11470 bind behavior remains
+an explicit physical-network blocker before activation.
+
+The Web build is now forced to identify itself with the pinned upstream
+Stremio Web commit, rather than accidentally inheriting this wrapper project's
+Git commit. A post-build gate verifies the commit-labeled scripts, styles and
+WASM paths.
+
+- final derived rootfs SHA-256:
+  `3613736431f6ee4d9ccee996b1208e27401e0cd3a85bd78ddc0bb385d15a44f0`
+- pinned Stremio Web asset commit:
+  `6303c9947967afff70faaa1071171bfd9b4b30d8`
+- original OSMC entries: 40,574
+- byte-and-metadata-identical original entries: 40,574
+- declared overlay entries: 120
+- undeclared changes: 0
+- Stremio Service autostart link present: no
+- Kodi autostart override present: no
+
+No Vero, eMMC, SD card or USB drive was accessed by this build.

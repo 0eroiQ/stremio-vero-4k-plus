@@ -1,0 +1,6 @@
+{
+  "cacheRoot": "/var/cache/stremio-vero/service",
+  "cacheSize": 2147483648,
+  "localAddonEnabled": false,
+  "remoteHttps": ""
+}
