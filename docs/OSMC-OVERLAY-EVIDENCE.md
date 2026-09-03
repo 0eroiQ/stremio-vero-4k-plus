@@ -83,6 +83,8 @@ WASM paths.
   `3613736431f6ee4d9ccee996b1208e27401e0cd3a85bd78ddc0bb385d15a44f0`
 - pinned Stremio Web asset commit:
   `6303c9947967afff70faaa1071171bfd9b4b30d8`
+- GitHub full validation, including the ARM launcher smoke test:
+  `https://github.com/0eroiQ/stremio-vero-4k-plus/actions/runs/33731712217`
 - original OSMC entries: 40,574
 - byte-and-metadata-identical original entries: 40,574
 - declared overlay entries: 120
