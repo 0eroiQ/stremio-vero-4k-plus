@@ -43,6 +43,8 @@ mirrored, modified, or re-signed by this project.
 The first hardware artifact will be external-boot-only. It must contain no
 installer, flasher, partitioner, eMMC write service, or automatic migration.
 Every build and test gate is documented in [docs/SAFETY.md](docs/SAFETY.md).
+Recorded CI hashes and their exact scope are in
+[docs/OFFLINE-EVIDENCE.md](docs/OFFLINE-EVIDENCE.md).
 
 ## Project status
 

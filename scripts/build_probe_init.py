@@ -268,6 +268,8 @@ def main() -> None:
     )
     print(f"storage-blind AArch64 init: PASS ({details['sha256']})")
     print("allowed syscalls: write, nanosleep")
+    for name, version in tool_versions.items():
+        print(f"{name} tool: {version}")
     print("physical boot status: NOT TESTED")
 
 
