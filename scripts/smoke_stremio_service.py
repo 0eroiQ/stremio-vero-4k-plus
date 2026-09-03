@@ -41,6 +41,7 @@ def smoke(runtime: Path, server: Path, emulator: Path, sysroot: Path) -> dict[st
     environment = os.environ.copy()
     environment.update(
         {
+            "CASTING_DISABLED": "1",
             "FFMPEG_BIN": "/bin/false",
             "FFPROBE_BIN": "/bin/false",
             "NO_HTTPS_SERVER": "1",
