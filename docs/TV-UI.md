@@ -49,6 +49,17 @@ key. Physical keyboard characters also update the same query. Results always
 come from Stremio Core; before the user enters a query, the screen uses the first
 available real Stremio catalog as its TV trending view.
 
+## Add-ons and Settings behavior
+
+Add-ons keeps the official Stremio install, configure, remove, share, filtering,
+and URL flows. The route is presented as a compact ten-foot list with clear
+remote focus and no replacement or hardcoded add-on data.
+
+Settings keeps the official Stremio sections and the Vero 4K+ Device section in
+a two-plane TV layout: a section rail at the left and large focusable setting
+cards at the right. This is a presentation change only; the same Core and Vero
+settings adapters remain responsible for the values.
+
 No media title, artwork, description, catalog, or account content may be
 hardcoded in the Vero overlay. All such content must originate in Stremio Core.
 

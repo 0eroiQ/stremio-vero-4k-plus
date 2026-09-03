@@ -1,0 +1,319 @@
+// Apple TV-style presentation layered over the official Stremio Add-ons route.
+
+@import (reference) '~@stremio/stremio-colors/less/stremio-colors.less';
+@import (reference) '~stremio/common/screen-sizes.less';
+
+:import('~stremio/components/Multiselect/styles.less') {
+    multiselect-menu-container: menu-container;
+}
+
+:import('~stremio/components/ModalDialog/styles.less') {
+    share-modal-content: modal-dialog-content;
+}
+
+:import('~stremio/components/ModalDialog/styles.less') {
+    addon-modal-content: modal-dialog-content;
+    cancel-button-label: label;
+}
+
+:import('~stremio/components/ModalDialog/styles.less') {
+    filters-modal-container: modal-dialog-container;
+    filters-modal-content: modal-dialog-content;
+}
+
+.addons-container {
+    width: 100%;
+    height: calc(100% - var(--safe-area-inset-bottom));
+    overflow: hidden;
+    color: #fff;
+    background:
+        radial-gradient(circle at 72% -10%, rgba(82, 54, 174, 0.24), transparent 48%),
+        #050509;
+
+    .addons-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .selectable-inputs-container {
+            position: relative;
+            z-index: 3;
+            flex: none;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            min-height: 7.4rem;
+            padding: 2.2rem 4.25% 1.1rem;
+            border-bottom: 0.08rem solid rgba(255, 255, 255, 0.08);
+
+            &::before {
+                content: 'Add-ons';
+                flex: none;
+                margin-right: 1.1rem;
+                font-size: 2.2rem;
+                font-weight: 700;
+                letter-spacing: -0.035em;
+            }
+
+            .select-input-container {
+                flex: 0 1 12rem;
+                min-width: 8.5rem;
+                max-width: 14rem;
+                background: transparent;
+
+                > div > button {
+                    min-height: 2.55rem;
+                    padding: 0.45rem 0.9rem;
+                    border: 0.08rem solid rgba(255, 255, 255, 0.16);
+                    border-radius: 1.4rem;
+                    background: rgba(28, 28, 37, 0.82);
+
+                    &:focus {
+                        border-color: #fff;
+                        outline: 0.12rem solid rgba(255, 255, 255, 0.9);
+                        outline-offset: 0.12rem;
+                        background: rgba(255, 255, 255, 0.17);
+                    }
+                }
+
+                .multiselect-menu-container {
+                    overflow: auto;
+                }
+            }
+
+            .spacing {
+                flex: 1;
+            }
+
+            .add-button-container {
+                flex: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.45rem;
+                height: 2.65rem;
+                padding: 0 1.15rem;
+                border-radius: 1.4rem;
+                color: #fff;
+                background: rgba(113, 83, 255, 0.84);
+
+                &:hover, &:focus {
+                    outline: 0.12rem solid #fff;
+                    outline-offset: 0.12rem;
+                    background: rgba(133, 107, 255, 0.94);
+                }
+
+                .icon {
+                    width: 1rem;
+                    height: 1rem;
+                    color: #fff;
+                }
+
+                .add-button-label {
+                    max-height: 2.4em;
+                    overflow: hidden;
+                    font-size: 0.9rem;
+                    font-weight: 650;
+                }
+            }
+
+            .search-bar {
+                flex: 0 1 16rem;
+                min-width: 9rem;
+
+                input {
+                    min-height: 2.55rem;
+                    border-radius: 1.4rem;
+                    background: rgba(28, 28, 37, 0.82);
+                }
+            }
+
+            .filter-button {
+                display: none;
+            }
+        }
+
+        .message-container {
+            flex: 1;
+            padding: 3rem 4.25%;
+            font-size: 1.6rem;
+            color: rgba(255, 255, 255, 0.62);
+        }
+
+        .addons-list-container {
+            flex: 1;
+            min-height: 0;
+            padding: 1.35rem 4.25% 3rem;
+            overflow-y: auto;
+            scroll-padding: 1.35rem 0 3rem;
+            scrollbar-width: none;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            .addon {
+                margin-bottom: 0.7rem;
+            }
+        }
+    }
+}
+
+.filters-modal {
+    .filters-modal-container {
+        overflow: visible;
+
+        .filters-modal-content {
+            display: flex;
+            flex-direction: column;
+            overflow: visible !important;
+
+            .select-input-container {
+                height: 3rem;
+
+                .multiselect-menu-container {
+                    overflow: auto;
+                }
+
+                &:not(:last-child) {
+                    margin-bottom: 1rem;
+                }
+            }
+        }
+    }
+}
+
+.add-addon-modal-container {
+    .addon-modal-content {
+        width: min(42rem, 72vw);
+
+        .notice {
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            line-height: 1.45;
+            color: rgba(255, 255, 255, 0.72);
+        }
+
+        .addon-url-input {
+            width: 100%;
+            padding: 1rem;
+            color: #fff;
+            border-radius: 1rem;
+            background: rgba(255, 255, 255, 0.09);
+            outline: 0.1rem solid rgba(255, 255, 255, 0.14);
+
+            &:focus {
+                outline-color: #fff;
+            }
+        }
+    }
+
+    .cancel-button {
+        background: transparent;
+        opacity: 0.5;
+
+        &:hover, &:focus {
+            outline: var(--focus-outline-size) solid #fff;
+            opacity: 1;
+        }
+
+        .cancel-button-label {
+            color: #fff;
+        }
+    }
+}
+
+.share-modal-container {
+    .share-modal-content {
+        width: min(42rem, 72vw);
+
+        .title-container {
+            display: flex;
+            align-items: center;
+
+            .logo, .icon {
+                width: 5rem;
+                height: 5rem;
+                margin-right: 1.5rem;
+                padding: 0.5rem;
+            }
+
+            .logo {
+                object-fit: contain;
+            }
+
+            .icon {
+                color: #fff;
+            }
+
+            .name-container {
+                flex: 1;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: baseline;
+
+                .name {
+                    margin-right: 0.5rem;
+                    font-size: 1.6rem;
+                    color: #fff;
+                }
+
+                .version {
+                    color: rgba(255, 255, 255, 0.58);
+                }
+            }
+        }
+
+        .share-prompt-container {
+            margin-top: 1rem;
+        }
+    }
+}
+
+@media (max-height: 760px) {
+    .addons-container .addons-content {
+        .selectable-inputs-container {
+            min-height: 5.6rem;
+            padding-top: 1.2rem;
+            padding-bottom: 0.75rem;
+
+            &::before {
+                font-size: 1.8rem;
+            }
+        }
+
+        .addons-list-container {
+            padding-top: 0.8rem;
+        }
+    }
+}
+
+@media only screen and (max-width: @minimum) {
+    .addons-container .addons-content {
+        .selectable-inputs-container {
+            padding-right: 1.5rem;
+            padding-left: 1.5rem;
+
+            &::before, .select-input-container, .add-button-container {
+                display: none;
+            }
+
+            .filter-button {
+                display: flex;
+                width: 2.7rem;
+                height: 2.7rem;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.09);
+            }
+        }
+
+        .addons-list-container {
+            padding-right: 1.5rem;
+            padding-left: 1.5rem;
+        }
+    }
+}

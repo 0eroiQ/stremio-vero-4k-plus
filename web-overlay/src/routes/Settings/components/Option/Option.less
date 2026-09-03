@@ -1,0 +1,92 @@
+.option {
+    position: relative;
+    width: 100%;
+    min-height: 3.7rem;
+    flex: none;
+    display: grid;
+    grid-template-columns: minmax(12rem, 1fr) minmax(13rem, 0.8fr);
+    align-items: center;
+    gap: 1.6rem;
+    padding: 0.55rem 0.45rem;
+    border-top: 0.06rem solid rgba(255, 255, 255, 0.055);
+    overflow: visible;
+
+    .heading, .content {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .heading {
+        gap: 0.65rem;
+
+        .icon {
+            width: 2.3rem;
+            height: 2.3rem;
+            color: rgba(255, 255, 255, 0.72);
+        }
+
+        .label {
+            display: -webkit-box;
+            overflow: hidden;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            font-size: 0.94rem;
+            line-height: 1.25rem;
+            color: rgba(255, 255, 255, 0.82);
+        }
+    }
+
+    .content {
+        justify-content: flex-end;
+        overflow: visible;
+
+        :global(.multiselect) {
+            width: 100%;
+            padding: 0;
+            border-radius: 1.4rem;
+            background: rgba(255, 255, 255, 0.085);
+        }
+
+        :global(.button) {
+            min-width: 10rem;
+            min-height: 2.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 1.2rem;
+            border-radius: 1.4rem;
+            font-weight: 600;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.09);
+
+            &:hover, &:focus {
+                outline: 0.12rem solid #fff;
+                outline-offset: 0.12rem;
+                background: rgba(255, 255, 255, 0.17);
+            }
+        }
+
+        :global(.color-input) {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 0.1rem solid transparent;
+            border-radius: 1.4rem;
+
+            &:focus {
+                border-color: #fff;
+            }
+        }
+    }
+}
+
+@media (max-width: 58rem) {
+    .option {
+        grid-template-columns: 1fr;
+        gap: 0.45rem;
+
+        .content {
+            justify-content: stretch;
+        }
+    }
+}

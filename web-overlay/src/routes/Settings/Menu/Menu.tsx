@@ -26,22 +26,22 @@ const Menu = ({ selected, streamingServer, onSelect }: Props) => {
 
     return (
         <div className={styles['menu']}>
-            <Button className={classNames(styles['button'], { [styles['selected']]: selected === SECTIONS.GENERAL })} title={t('SETTINGS_NAV_GENERAL')} data-section={SECTIONS.GENERAL} onClick={onSelect}>
+            <Button className={classNames(styles['button'], { [styles['selected']]: selected === SECTIONS.GENERAL })} title={t('SETTINGS_NAV_GENERAL')} data-section={SECTIONS.GENERAL} data-tv-row={'settings-menu'} data-tv-item={0} onClick={onSelect}>
                 { t('SETTINGS_NAV_GENERAL') }
             </Button>
-            <Button className={classNames(styles['button'], { [styles['selected']]: selected === SECTIONS.INTERFACE })} title={t('INTERFACE')} data-section={SECTIONS.INTERFACE} onClick={onSelect}>
+            <Button className={classNames(styles['button'], { [styles['selected']]: selected === SECTIONS.INTERFACE })} title={t('INTERFACE')} data-section={SECTIONS.INTERFACE} data-tv-row={'settings-menu'} data-tv-item={1} onClick={onSelect}>
                 { t('INTERFACE') }
             </Button>
-            <Button className={classNames(styles['button'], { [styles['selected']]: selected === SECTIONS.PLAYER })} title={t('SETTINGS_NAV_PLAYER')} data-section={SECTIONS.PLAYER} onClick={onSelect}>
+            <Button className={classNames(styles['button'], { [styles['selected']]: selected === SECTIONS.PLAYER })} title={t('SETTINGS_NAV_PLAYER')} data-section={SECTIONS.PLAYER} data-tv-row={'settings-menu'} data-tv-item={2} onClick={onSelect}>
                 { t('SETTINGS_NAV_PLAYER') }
             </Button>
-            <Button className={classNames(styles['button'], { [styles['selected']]: selected === SECTIONS.STREAMING })} title={t('SETTINGS_NAV_STREAMING')} data-section={SECTIONS.STREAMING} onClick={onSelect}>
+            <Button className={classNames(styles['button'], { [styles['selected']]: selected === SECTIONS.STREAMING })} title={t('SETTINGS_NAV_STREAMING')} data-section={SECTIONS.STREAMING} data-tv-row={'settings-menu'} data-tv-item={3} onClick={onSelect}>
                 { t('SETTINGS_NAV_STREAMING') }
             </Button>
-            <Button className={classNames(styles['button'], { [styles['selected']]: selected === SECTIONS.VERO })} title={'Vero 4K+ Device'} data-section={SECTIONS.VERO} onClick={onSelect}>
+            <Button className={classNames(styles['button'], { [styles['selected']]: selected === SECTIONS.VERO })} title={'Vero 4K+ Device'} data-section={SECTIONS.VERO} data-tv-row={'settings-menu'} data-tv-item={4} onClick={onSelect}>
                 Vero 4K+ Device
             </Button>
-            { !platform.isMobile && <Button className={classNames(styles['button'], { [styles['selected']]: selected === SECTIONS.SHORTCUTS })} title={t('SETTINGS_NAV_SHORTCUTS')} data-section={SECTIONS.SHORTCUTS} onClick={onSelect}>
+            { !platform.isMobile && <Button className={classNames(styles['button'], { [styles['selected']]: selected === SECTIONS.SHORTCUTS })} title={t('SETTINGS_NAV_SHORTCUTS')} data-section={SECTIONS.SHORTCUTS} data-tv-row={'settings-menu'} data-tv-item={5} onClick={onSelect}>
                 { t('SETTINGS_NAV_SHORTCUTS') }
             </Button> }
 

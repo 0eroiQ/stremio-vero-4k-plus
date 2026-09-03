@@ -18,6 +18,13 @@ VIDEOS_STYLES = ROOT / "web-overlay" / "src" / "routes" / "MetaDetails" / "Video
 STREAMS_STYLES = ROOT / "web-overlay" / "src" / "routes" / "MetaDetails" / "StreamsList" / "styles.less"
 SEARCH = ROOT / "web-overlay" / "src" / "routes" / "Search" / "Search.js"
 SEARCH_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Search" / "styles.less"
+ADDONS_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Addons" / "styles.less"
+ADDON_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Addons" / "Addon" / "styles.less"
+SETTINGS_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Settings" / "Settings.less"
+SETTINGS_MENU = ROOT / "web-overlay" / "src" / "routes" / "Settings" / "Menu" / "Menu.tsx"
+SETTINGS_MENU_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Settings" / "Menu" / "Menu.less"
+SETTINGS_SECTION_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Settings" / "components" / "Section" / "Section.less"
+SETTINGS_OPTION_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Settings" / "components" / "Option" / "Option.less"
 
 
 class TvUiOverlayTests(unittest.TestCase):
@@ -135,6 +142,29 @@ class TvUiOverlayTests(unittest.TestCase):
         self.assertIn("data-tv-row={'search-results'}", source)
         self.assertIn("grid-template-columns: repeat(6", styles)
         self.assertNotIn("The Whisper Man", source)
+
+    def test_addons_keep_official_route_with_tv_scale_and_focus(self) -> None:
+        route_styles = ADDONS_STYLES.read_text(encoding="utf-8")
+        card_styles = ADDON_STYLES.read_text(encoding="utf-8")
+
+        self.assertIn("content: 'Add-ons'", route_styles)
+        self.assertIn("scrollbar-width: none", route_styles)
+        self.assertIn("background: rgba(27, 27, 36, 0.88)", card_styles)
+        self.assertIn("&:hover, &:focus, &:focus-within", card_styles)
+
+    def test_settings_use_tv_section_rail_and_focusable_cards(self) -> None:
+        route_styles = SETTINGS_STYLES.read_text(encoding="utf-8")
+        menu = SETTINGS_MENU.read_text(encoding="utf-8")
+        menu_styles = SETTINGS_MENU_STYLES.read_text(encoding="utf-8")
+        section_styles = SETTINGS_SECTION_STYLES.read_text(encoding="utf-8")
+        option_styles = SETTINGS_OPTION_STYLES.read_text(encoding="utf-8")
+
+        self.assertIn("grid-template-columns: 17rem minmax(0, 1fr)", route_styles)
+        self.assertIn("data-tv-row={'settings-menu'} data-tv-item={0}", menu)
+        self.assertIn("content: 'Settings'", menu_styles)
+        self.assertIn("width: min(54rem, 100%)", section_styles)
+        self.assertIn("grid-template-columns: minmax(12rem, 1fr) minmax(13rem, 0.8fr)", option_styles)
+        self.assertIn("&:hover, &:focus", option_styles)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,55 @@
+// Ten-foot settings composition: section rail plus one calm, readable content plane.
+
+@import (reference) '~stremio/common/screen-sizes.less';
+
+.settings-container {
+    width: 100%;
+    height: calc(100% - var(--safe-area-inset-bottom));
+    overflow: hidden;
+    color: #fff;
+    background:
+        radial-gradient(circle at 85% 0%, rgba(70, 48, 155, 0.2), transparent 46%),
+        #050509;
+
+    .settings-content {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-columns: 17rem minmax(0, 1fr);
+        padding: 2.2rem 4.25% 2rem;
+        gap: 2.4rem;
+        overflow: hidden;
+
+        .sections-container {
+            min-width: 0;
+            height: 100%;
+            padding: 0 3rem 5rem 0;
+            overflow-y: auto;
+            scroll-padding: 1rem 0 5rem;
+            scrollbar-width: none;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+        }
+    }
+}
+
+@media (max-height: 760px) {
+    .settings-container .settings-content {
+        padding-top: 1.25rem;
+        padding-bottom: 1rem;
+    }
+}
+
+@media only screen and (max-width: @minimum) {
+    .settings-container .settings-content {
+        display: block;
+        padding-right: 1.5rem;
+        padding-left: 1.5rem;
+
+        .sections-container {
+            padding-right: 0;
+        }
+    }
+}
