@@ -1,0 +1,138 @@
+// Copyright (C) 2017-2023 Smart code 203358507
+
+:import('./Stream/styles.less') {
+    stream-card: stream-container;
+    stream-description: description-container;
+    stream-play: icon;
+}
+
+.streams-list-container {
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+
+    .select-choices-wrapper {
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        height: 2.8rem;
+        margin: 0 3rem 0.65rem 0;
+
+        .back-button-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.6rem;
+            height: 2.6rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+
+            &:focus {
+                outline: 0.14rem solid #fff;
+            }
+
+            .icon {
+                width: 1.2rem;
+                height: 1.2rem;
+                color: #fff;
+            }
+        }
+
+        .episode-title {
+            min-width: 12rem;
+            max-width: 28rem;
+            overflow: hidden;
+            font-size: 1.15rem;
+            font-weight: 600;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #fff;
+        }
+
+        .select-input-container {
+            width: 12rem;
+        }
+    }
+
+    .message-container {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+
+        .image {
+            display: none;
+        }
+
+        .label {
+            margin: 0.5rem 0;
+            font-size: 1.15rem;
+            color: rgba(255, 255, 255, 0.68);
+        }
+    }
+
+    .streams-container {
+        display: flex;
+        flex: 1;
+        align-items: stretch;
+        gap: 0.65rem;
+        min-height: 0;
+        margin: 0;
+        padding: 0.3rem 4rem 0.5rem 0.3rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        .stream-card {
+            flex: 0 0 21rem;
+            width: 21rem;
+            height: 9.5rem;
+            margin: 0;
+            padding: 0.8rem;
+            border: 0.15rem solid transparent;
+            border-radius: 0.65rem;
+            background: rgba(18, 18, 24, 0.84);
+
+            &:focus {
+                border-color: #fff;
+                background: rgba(34, 34, 44, 0.95);
+                transform: translateY(-0.2rem);
+
+                .stream-play {
+                    opacity: 1;
+                }
+            }
+
+            .stream-description {
+                display: -webkit-box;
+                overflow: hidden;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 4;
+                font-size: 0.9rem;
+                line-height: 1.35;
+                white-space: normal;
+            }
+        }
+    }
+
+    .install-button-container {
+        flex: 0 0 14rem;
+        align-self: stretch;
+        height: auto;
+        margin: 0;
+        border-radius: 0.65rem;
+    }
+
+    .addons-loading-container {
+        position: absolute;
+        right: 3rem;
+        bottom: 0;
+        margin: 0;
+    }
+}

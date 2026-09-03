@@ -10,6 +10,14 @@ RAIL_COMPONENT = ROOT / "web-overlay" / "src" / "components" / "NavBar" / "Verti
 RAIL_BUTTON = ROOT / "web-overlay" / "src" / "components" / "NavBar" / "VerticalNavBar" / "NavTabButton" / "NavTabButton.js"
 INTRO = ROOT / "web-overlay" / "src" / "routes" / "Intro" / "Intro.js"
 INTRO_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Intro" / "styles.less"
+DISCOVER = ROOT / "web-overlay" / "src" / "routes" / "Discover" / "Discover.js"
+LIBRARY = ROOT / "web-overlay" / "src" / "routes" / "Library" / "Library.js"
+META_DETAILS = ROOT / "web-overlay" / "src" / "routes" / "MetaDetails" / "MetaDetails.js"
+META_DETAILS_STYLES = ROOT / "web-overlay" / "src" / "routes" / "MetaDetails" / "styles.less"
+VIDEOS_STYLES = ROOT / "web-overlay" / "src" / "routes" / "MetaDetails" / "VideosList" / "styles.less"
+STREAMS_STYLES = ROOT / "web-overlay" / "src" / "routes" / "MetaDetails" / "StreamsList" / "styles.less"
+SEARCH = ROOT / "web-overlay" / "src" / "routes" / "Search" / "Search.js"
+SEARCH_STYLES = ROOT / "web-overlay" / "src" / "routes" / "Search" / "styles.less"
 
 
 class TvUiOverlayTests(unittest.TestCase):
@@ -67,6 +75,66 @@ class TvUiOverlayTests(unittest.TestCase):
         self.assertIn("interfaceLanguages", intro)
         self.assertNotIn("type={'password'}", intro)
         self.assertIn(".qr-frame", styles)
+
+    def test_discover_uses_real_core_catalog_in_tv_layout(self) -> None:
+        source = DISCOVER.read_text(encoding="utf-8")
+
+        self.assertIn("useDiscover(urlParams, queryParams)", source)
+        self.assertIn("discover.catalog.content.content", source)
+        self.assertIn("selectedItem?.background || selectedItem?.poster", source)
+        self.assertEqual(source.count("<section className={styles['catalog-stage']}>") , 1)
+        self.assertIn("<MetaItem", source)
+        self.assertIn("data-tv-row={0}", source)
+        self.assertNotIn("MetaPreview", source)
+        self.assertNotIn("The Whisper Man", source)
+
+    def test_library_uses_real_account_catalog_in_tv_layout(self) -> None:
+        source = LIBRARY.read_text(encoding="utf-8")
+
+        self.assertIn("useLibrary(model, urlParams, queryParams)", source)
+        self.assertIn("selectedItem?.background || selectedItem?.poster", source)
+        self.assertEqual(source.count("<section className={styles['catalog-stage']}>") , 1)
+        self.assertIn("<LibItem", source)
+        self.assertIn("data-tv-row={0}", source)
+        self.assertIn("notifications={notifications}", source)
+        self.assertNotIn("The Whisper Man", source)
+
+    def test_details_keeps_core_actions_but_uses_tv_composition(self) -> None:
+        source = META_DETAILS.read_text(encoding="utf-8")
+        styles = META_DETAILS_STYLES.read_text(encoding="utf-8")
+
+        self.assertIn("useMetaDetails(urlParams)", source)
+        self.assertIn("<MainNavBars", source)
+        self.assertNotIn("HorizontalNavBar", source)
+        self.assertIn("compact={true}", source)
+        self.assertIn("action: 'AddToLibrary'", source)
+        self.assertIn("action: 'RemoveFromLibrary'", source)
+        self.assertIn("<VideosList", source)
+        self.assertIn("<StreamsList", source)
+        self.assertIn("bottom: 3.25%", styles)
+
+    def test_details_uses_horizontal_episode_and_source_rows(self) -> None:
+        videos = VIDEOS_STYLES.read_text(encoding="utf-8")
+        streams = STREAMS_STYLES.read_text(encoding="utf-8")
+
+        self.assertIn("overflow-x: auto", videos)
+        self.assertIn("flex: 0 0 20rem", videos)
+        self.assertIn("overflow-x: auto", streams)
+        self.assertIn("flex: 0 0 21rem", streams)
+
+    def test_search_has_tv_keyboard_and_real_results(self) -> None:
+        source = SEARCH.read_text(encoding="utf-8")
+        styles = SEARCH_STYLES.read_text(encoding="utf-8")
+
+        self.assertIn("useSearch(queryParams)", source)
+        self.assertIn("useBoard()", source)
+        self.assertIn("'abcdefghijklmnopqrstuvwxyz'.split('')", source)
+        self.assertIn("MediaPlayPause", source)
+        self.assertIn("<MetaItem", source)
+        self.assertIn("data-tv-key={key.id === characterKeys[0] ? 'entry'", source)
+        self.assertIn("data-tv-row={'search-results'}", source)
+        self.assertIn("grid-template-columns: repeat(6", styles)
+        self.assertNotIn("The Whisper Man", source)
 
 
 if __name__ == "__main__":

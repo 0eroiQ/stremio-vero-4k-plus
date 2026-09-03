@@ -19,6 +19,36 @@ not the product UI.
   position.
 - Selecting an item opens the existing Stremio detail route.
 
+## Discover and Library behavior
+
+Discover, Library, and Continue Watching use the same living-room composition
+as Home: the focused real Stremio item fills the hero and exactly one horizontal
+catalog row remains in the lower part of the screen. Discover keeps its real
+catalog filters and Library keeps its real type and sort controls, but presents
+them as compact remote-friendly controls instead of the upstream desktop grid
+and preview panel.
+
+Moving focus changes the hero. Selecting a card continues through the existing
+Stremio detail route; Library actions and account state remain owned by Stremio
+Core. The left rail stays narrow until it receives focus.
+
+## Detail behavior
+
+Detail pages keep the same full-screen hero and left rail, but this is where
+hero actions are allowed. The real Stremio detail model continues to own Play,
+Trailer, Library, watched state, ratings, seasons, episodes, and stream source
+selection. Series episodes and stream sources are presented as one horizontal
+remote-friendly row in the lower part of the screen instead of a desktop side
+panel.
+
+## Search behavior
+
+Search uses a single-line TV keyboard with ABC/123 switching, Space, characters,
+and backspace. Play/Pause may switch keyboard modes when the remote reports that
+key. Physical keyboard characters also update the same query. Results always
+come from Stremio Core; before the user enters a query, the screen uses the first
+available real Stremio catalog as its TV trending view.
+
 No media title, artwork, description, catalog, or account content may be
 hardcoded in the Vero overlay. All such content must originate in Stremio Core.
 

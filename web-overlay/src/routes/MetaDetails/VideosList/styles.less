@@ -1,0 +1,116 @@
+// Copyright (C) 2017-2023 Smart code 203358507
+
+:import('~stremio/components/Video/styles.less') {
+    video-card: video-container;
+    video-thumbnail-container: thumbnail-container;
+    video-thumbnail: thumbnail;
+    video-info: info-container;
+    video-title: title-container;
+    video-play: play-button-container;
+}
+
+.videos-list-container {
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+
+    .message-container {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+
+        .episode-picker {
+            margin-bottom: 1rem;
+        }
+
+        .image {
+            display: none;
+        }
+
+        .label {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.68);
+        }
+    }
+
+    .notifications-toggle {
+        position: absolute;
+        top: 0.35rem;
+        right: 3rem;
+        z-index: 2;
+        color: rgba(255, 255, 255, 0.72);
+    }
+
+    .seasons-bar {
+        flex: none;
+        width: 27rem;
+        height: 2.5rem;
+        margin: 0 0 0.65rem;
+        padding: 0;
+    }
+
+    .search-bar {
+        display: none;
+    }
+
+    .videos-container, .videos-scroll-container {
+        display: flex;
+        flex: 1;
+        align-items: stretch;
+        gap: 0.65rem;
+        min-height: 0;
+        padding: 0.3rem 4rem 0.5rem 0.3rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        .video-card {
+            flex: 0 0 20rem;
+            width: 20rem;
+            min-height: 9.5rem;
+            max-height: 12rem;
+            margin: 0;
+            padding: 0.55rem;
+            border: 0.15rem solid transparent;
+            border-radius: 0.65rem;
+            background: rgba(18, 18, 24, 0.82);
+
+            &:focus {
+                border-color: #fff;
+                background: rgba(34, 34, 44, 0.94);
+                transform: translateY(-0.2rem);
+            }
+
+            .video-thumbnail-container {
+                .video-thumbnail {
+                    width: 9rem;
+                    height: 5.65rem;
+                    border-radius: 0.35rem;
+                }
+            }
+
+            .video-info {
+                min-width: 0;
+                padding: 0 0.5rem 0 0.8rem;
+
+                .video-title {
+                    margin-bottom: 0.65rem;
+                    font-size: 1rem;
+                    line-height: 1.3;
+                }
+            }
+
+            .video-play {
+                width: 2.6rem;
+                height: 2.6rem;
+                margin-right: 0;
+            }
+        }
+    }
+}
