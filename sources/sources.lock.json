@@ -60,6 +60,15 @@
       "use": "armhf-replacement-for-the-upstream-x86-64-stremio-runtime"
     },
     {
+      "name": "FFmpeg 4.4.1 static Linux armhf",
+      "url": "https://johnvansickle.com/ffmpeg/old-releases/ffmpeg-4.4.1-armhf-static.tar.xz",
+      "license": "GPL-3.0-or-later-and-bundled-third-party",
+      "revision_type": "release",
+      "revision": "4.4.1-armhf-static",
+      "sha256": "42069b3e7289acf9772ed651f56fe13a53274165db55d005444a1bc1551cdd2f",
+      "use": "armhf-counterpart-to-the-ffmpeg-4.4.1-static-build-used-upstream"
+    },
+    {
       "name": "OSMC distribution recipes",
       "url": "https://github.com/osmc/osmc.git",
       "license": "GPL-2.0-only",
@@ -94,8 +103,7 @@
     }
   ],
   "unresolved": [
-    "Provide and prove compatible ARM hard-float ffmpeg and ffprobe for Stremio Server",
-    "Complete the Stremio Service ARM startup smoke test and Vero integration test",
+    "Complete the Stremio Service ARM media-tool smoke test and Vero integration test",
     "Select and prove a fullscreen WPE or WebKit kiosk host on OSMC Bullseye armhf",
     "Complete Stremio stream interception and Kodi display hand-off",
     "Connect narrow ConnMan BlueZ CEC and OSMC lifecycle adapters",

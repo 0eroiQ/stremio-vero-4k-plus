@@ -6,6 +6,7 @@ OSMC_SHA256 := a7736298e5c14f705223d4c9a2b560fdc62e819533acccbc78dad3954de63187
 STREMIO_WEB_COMMIT := 6303c9947967afff70faaa1071171bfd9b4b30d8
 STREMIO_SERVER_SHA256 := 405eb494d6708406a30e716c3cfb5abae7a5e9c7a8b79446d64c3f821385930f
 NODE_ARMHF_SHA256 := d0131a764c0f44821fdacb3c3ab8b35b52af060a98ac7a150ec49d4c540be3d7
+FFMPEG_ARMHF_SHA256 := 42069b3e7289acf9772ed651f56fe13a53274165db55d005444a1bc1551cdd2f
 QEMU_ARM ?= /usr/bin/qemu-arm-static
 ARM_SYSROOT ?= /usr/arm-linux-gnueabihf
 
@@ -48,12 +49,16 @@ stremio-service-runtime:
 	  --name "Stremio Server 4.21.1 JavaScript bundle"
 	@python3 scripts/fetch_verified.py sources/sources.lock.json \
 	  --name "Node.js 18.12.1 Linux armv7l runtime"
+	@python3 scripts/fetch_verified.py sources/sources.lock.json \
+	  --name "FFmpeg 4.4.1 static Linux armhf"
 	@python3 scripts/prepare_stremio_service.py \
 	  --node-archive .cache/downloads/node-v18.12.1-linux-armv7l.tar.xz \
 	  --server-js .cache/downloads/server.js \
+	  --ffmpeg-archive .cache/downloads/ffmpeg-4.4.1-armhf-static.tar.xz \
 	  --output out/stremio-service-armhf \
 	  --expected-node-sha256 $(NODE_ARMHF_SHA256) \
-	  --expected-server-sha256 $(STREMIO_SERVER_SHA256)
+	  --expected-server-sha256 $(STREMIO_SERVER_SHA256) \
+	  --expected-ffmpeg-sha256 $(FFMPEG_ARMHF_SHA256)
 
 stremio-service-audit: stremio-service-source stremio-service-runtime
 	@python3 scripts/audit_stremio_service.py \
@@ -64,6 +69,8 @@ stremio-service-smoke: stremio-service-runtime
 	@python3 scripts/smoke_stremio_service.py \
 	  --runtime out/stremio-service-armhf/stremio-runtime \
 	  --server out/stremio-service-armhf/server.js \
+	  --ffmpeg out/stremio-service-armhf/ffmpeg \
+	  --ffprobe out/stremio-service-armhf/ffprobe \
 	  --emulator $(QEMU_ARM) \
 	  --sysroot $(ARM_SYSROOT)
 

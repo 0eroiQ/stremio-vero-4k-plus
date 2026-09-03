@@ -110,6 +110,12 @@ class FetchSafetyTests(unittest.TestCase):
             ),
             "node-v18.12.1-linux-armv7l.tar.xz",
         )
+        self.assertEqual(
+            self.fetch.safe_name(
+                "https://johnvansickle.com/ffmpeg/old-releases/ffmpeg-4.4.1-armhf-static.tar.xz"
+            ),
+            "ffmpeg-4.4.1-armhf-static.tar.xz",
+        )
         with self.assertRaises(ValueError):
             self.fetch.safe_name("https://example.com/app.apk")
 
@@ -156,6 +162,19 @@ class StremioServiceRuntimeTests(unittest.TestCase):
         self.assertEqual(details["httpPort"], 11470)
         with self.assertRaisesRegex(ValueError, "missing expected markers"):
             self.prepare.verify_server_js(b"x" * (1024 * 1024))
+
+    def test_static_armhf_ffmpeg_contract(self) -> None:
+        header = bytearray(52)
+        header[:6] = b"\x7fELF\x01\x01"
+        struct.pack_into("<H", header, 18, 40)
+        payload = bytes(header) + self.prepare.FFMPEG_VERSION
+        details = self.prepare.verify_armhf_ffmpeg(payload, "ffmpeg")
+        self.assertEqual(details["linkage"], "static")
+        self.assertEqual(details["version"], "4.4.1-static")
+        with self.assertRaisesRegex(ValueError, "unexpectedly dynamically linked"):
+            self.prepare.verify_armhf_ffmpeg(
+                payload + b"/ld-linux-armhf.so.3", "ffmpeg"
+            )
 
     def test_tar_paths_and_elf_audit_are_strict(self) -> None:
         self.assertTrue(self.prepare.safe_tar_member("node/bin/node"))

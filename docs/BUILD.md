@@ -49,10 +49,11 @@ builder then combines the exact official Server 4.21.1 JavaScript bundle with
 the matching official Node.js 18.12.1 Linux ARMv7 hard-float runtime beneath
 `out/stremio-service-armhf/`.
 
-The output is not added to the rootfs yet. It deliberately reports
-`imageEligible: false` until compatible ARM `ffmpeg` and `ffprobe` inputs and
-the startup/playback tests pass. CI runs the Node/server startup smoke test
-under QEMU; that test does not claim media playback.
+The output includes pinned static ARM builds of FFmpeg 4.4.1 and ffprobe from
+the same release family embedded by upstream Stremio Service. It is not added
+to the rootfs yet and deliberately reports `imageEligible: false`. CI executes
+Node, FFmpeg and ffprobe and starts the server under QEMU; this proves ARM
+startup compatibility, not media playback or Vero hardware integration.
 
 ## 4. Build the OSMC rootfs overlay
 

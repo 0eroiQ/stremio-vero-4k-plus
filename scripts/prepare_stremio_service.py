@@ -17,7 +17,11 @@ OUT = ROOT / "out"
 EM_ARM = 40
 NODE_MEMBER = "node-v18.12.1-linux-armv7l/bin/node"
 NODE_LICENSE_MEMBER = "node-v18.12.1-linux-armv7l/LICENSE"
+FFMPEG_MEMBER = "ffmpeg-4.4.1-armhf-static/ffmpeg"
+FFPROBE_MEMBER = "ffmpeg-4.4.1-armhf-static/ffprobe"
+FFMPEG_LICENSE_MEMBER = "ffmpeg-4.4.1-armhf-static/GPLv3.txt"
 ARMHF_INTERPRETER = b"/lib/ld-linux-armhf.so.3"
+FFMPEG_VERSION = b"FFmpeg version 4.4.1-static https://johnvansickle.com/ffmpeg/"
 GLIBC_VERSION = re.compile(rb"GLIBC_([0-9]+)\.([0-9]+)")
 
 
@@ -110,6 +114,29 @@ def verify_server_js(payload: bytes) -> dict[str, object]:
     }
 
 
+def verify_armhf_ffmpeg(payload: bytes, program: str) -> dict[str, object]:
+    if len(payload) < 52 or payload[:4] != b"\x7fELF":
+        raise ValueError(f"{program} is not an ELF executable")
+    if payload[4] != 1 or payload[5] != 1:
+        raise ValueError(f"{program} is not a 32-bit little-endian ELF")
+    machine = struct.unpack_from("<H", payload, 18)[0]
+    if machine != EM_ARM:
+        raise ValueError(f"{program} has wrong ELF machine: {machine}")
+    if b"/ld-linux" in payload:
+        raise ValueError(f"{program} is unexpectedly dynamically linked")
+    if FFMPEG_VERSION not in payload:
+        raise ValueError(f"{program} is not the expected FFmpeg 4.4.1 static build")
+    return {
+        "sha256": digest_bytes(payload),
+        "elfClass": 32,
+        "endianness": "little",
+        "machine": "ARM",
+        "abi": "armhf",
+        "linkage": "static",
+        "version": "4.4.1-static",
+    }
+
+
 def guarded_output(path: Path) -> Path:
     resolved = path.resolve()
     if resolved == OUT.resolve() or not resolved.is_relative_to(OUT.resolve()):
@@ -126,23 +153,34 @@ def write_file(path: Path, payload: bytes, mode: int) -> None:
 def prepare(
     node_archive: Path,
     server_js: Path,
+    ffmpeg_archive: Path,
     output: Path,
     expected_node_sha256: str,
     expected_server_sha256: str,
+    expected_ffmpeg_sha256: str,
 ) -> dict[str, object]:
     output = guarded_output(output)
     verify_digest(node_archive, expected_node_sha256)
     verify_digest(server_js, expected_server_sha256)
+    verify_digest(ffmpeg_archive, expected_ffmpeg_sha256)
 
     node = read_exact_member(node_archive, NODE_MEMBER)
     license_text = read_exact_member(node_archive, NODE_LICENSE_MEMBER)
     server = server_js.read_bytes()
+    ffmpeg = read_exact_member(ffmpeg_archive, FFMPEG_MEMBER)
+    ffprobe = read_exact_member(ffmpeg_archive, FFPROBE_MEMBER)
+    ffmpeg_license = read_exact_member(ffmpeg_archive, FFMPEG_LICENSE_MEMBER)
     node_details = verify_armhf_node(node)
     server_details = verify_server_js(server)
+    ffmpeg_details = verify_armhf_ffmpeg(ffmpeg, "ffmpeg")
+    ffprobe_details = verify_armhf_ffmpeg(ffprobe, "ffprobe")
 
     write_file(output / "stremio-runtime", node, 0o755)
     write_file(output / "server.js", server, 0o644)
     write_file(output / "LICENSE.node", license_text, 0o644)
+    write_file(output / "ffmpeg", ffmpeg, 0o755)
+    write_file(output / "ffprobe", ffprobe, 0o755)
+    write_file(output / "LICENSE.ffmpeg", ffmpeg_license, 0o644)
 
     report: dict[str, object] = {
         "target": "OSMC Bullseye armhf on Vero 4K+",
@@ -150,13 +188,14 @@ def prepare(
         "nodeRuntimeSha256": digest_bytes(node),
         "node": node_details,
         "server": server_details,
+        "ffmpegArchiveSha256": expected_ffmpeg_sha256,
+        "ffmpeg": ffmpeg_details,
+        "ffprobe": ffprobe_details,
         "upstreamLinuxBundleAccepted": False,
         "upstreamLinuxBundleReason": "official bundled executables are x86-64",
         "imageEligible": False,
         "remainingBlockers": [
-            "verified ARM hard-float ffmpeg",
-            "verified ARM hard-float ffprobe",
-            "ARM service startup smoke test",
+            "ARM service and media-tool smoke test",
             "Vero playback integration test",
         ],
     }
@@ -170,16 +209,20 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--node-archive", type=Path, required=True)
     parser.add_argument("--server-js", type=Path, required=True)
+    parser.add_argument("--ffmpeg-archive", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=OUT / "stremio-service-armhf")
     parser.add_argument("--expected-node-sha256", required=True)
     parser.add_argument("--expected-server-sha256", required=True)
+    parser.add_argument("--expected-ffmpeg-sha256", required=True)
     args = parser.parse_args()
     prepare(
         args.node_archive,
         args.server_js,
+        args.ffmpeg_archive,
         args.output,
         args.expected_node_sha256,
         args.expected_server_sha256,
+        args.expected_ffmpeg_sha256,
     )
 
 

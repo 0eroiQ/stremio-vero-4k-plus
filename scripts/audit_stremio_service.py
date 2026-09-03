@@ -34,9 +34,9 @@ def audit(upstream: Path, prepared: Path) -> dict[str, object]:
     for path in upstream_files:
         if not path.is_file():
             raise ValueError(f"missing upstream Linux bundle input: {path}")
-    prepared_node = prepared / "stremio-runtime"
+    prepared_files = [prepared / name for name in ("stremio-runtime", "ffmpeg", "ffprobe")]
     manifest_path = prepared / "runtime-manifest.json"
-    if not prepared_node.is_file() or not manifest_path.is_file():
+    if any(not path.is_file() for path in prepared_files) or not manifest_path.is_file():
         raise ValueError("prepared ARM runtime is incomplete")
 
     upstream_details = [elf_details(path) for path in upstream_files]
@@ -44,16 +44,16 @@ def audit(upstream: Path, prepared: Path) -> dict[str, object]:
         raise ValueError("upstream Linux bundle architecture changed; review required")
     if UPSTREAM_NODE_VERSION not in upstream_files[0].read_bytes():
         raise ValueError("upstream Stremio runtime no longer identifies as Node.js 18.12.1")
-    prepared_details = elf_details(prepared_node)
-    if prepared_details["machine"] != "ARM" or prepared_details["bits"] != 32:
-        raise ValueError("prepared runtime is not 32-bit ARM")
+    prepared_details = [elf_details(path) for path in prepared_files]
+    if any(item["machine"] != "ARM" or item["bits"] != 32 for item in prepared_details):
+        raise ValueError("prepared runtime contains a non-armhf executable")
 
     prepared_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     report = {
         "upstreamRejected": True,
         "upstreamRuntimeNodeVersion": "18.12.1",
         "upstreamExecutables": upstream_details,
-        "preparedRuntime": prepared_details,
+        "preparedExecutables": prepared_details,
         "preparedRuntimeImageEligible": prepared_manifest["imageEligible"],
         "remainingBlockers": prepared_manifest["remainingBlockers"],
     }

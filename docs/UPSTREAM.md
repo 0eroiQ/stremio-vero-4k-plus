@@ -46,8 +46,15 @@ the matching official Node.js Linux `armv7l` archive and the exact official
 Stremio Server 4.21.1 JavaScript bundle. The prepared Node executable is
 verified as 32-bit ARM hard-float and requires at most GLIBC 2.28, which is
 within the pinned OSMC Bullseye GLIBC 2.31 baseline. This proves architecture
-compatibility only. ARM `ffmpeg` and `ffprobe`, startup under emulation and
-physical Vero playback remain explicit gates.
+compatibility only.
+
+The binaries in upstream Stremio Service identify themselves as FFmpeg
+`4.4.1-static` from johnvansickle.com. The project pins the matching archived
+ARM hard-float release, verifies both programs as statically linked 32-bit ARM,
+and executes their version probes under emulation. The archive has no published
+sidecar signature in its download directory, so our observed SHA-256 is pinned
+and the provenance limitation remains documented. Physical Vero playback is
+still a separate gate.
 
 ## Kodi settings provenance
 

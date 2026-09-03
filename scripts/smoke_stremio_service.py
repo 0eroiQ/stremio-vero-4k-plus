@@ -31,8 +31,33 @@ def wait_for_http(process: subprocess.Popen[bytes], timeout: float) -> int:
     raise RuntimeError(last_error)
 
 
-def smoke(runtime: Path, server: Path, emulator: Path, sysroot: Path) -> dict[str, object]:
-    for path in (runtime, server, emulator):
+def execute_version(emulator: Path, executable: Path, expected: str) -> str:
+    probe = subprocess.run(
+        [str(emulator), str(executable), "-version"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        timeout=10,
+    )
+    output = probe.stdout.decode("utf-8", "replace")
+    if probe.returncode != 0:
+        raise RuntimeError(
+            f"{executable.name} probe exited with status {probe.returncode}: {output}"
+        )
+    first_line = output.splitlines()[0] if output.splitlines() else ""
+    if expected not in first_line:
+        raise RuntimeError(f"unexpected {executable.name} version: {first_line!r}")
+    return first_line
+
+
+def smoke(
+    runtime: Path,
+    server: Path,
+    ffmpeg: Path,
+    ffprobe: Path,
+    emulator: Path,
+    sysroot: Path,
+) -> dict[str, object]:
+    for path in (runtime, server, ffmpeg, ffprobe, emulator):
         if not path.is_file():
             raise ValueError(f"required input is missing: {path}")
     if not sysroot.is_dir():
@@ -63,6 +88,11 @@ def smoke(runtime: Path, server: Path, emulator: Path, sysroot: Path) -> dict[st
         )
     if version_output != "v18.12.1":
         raise RuntimeError(f"unexpected ARM Node version: {version_output!r}")
+    ffmpeg_version = execute_version(emulator, ffmpeg, "ffmpeg version 4.4.1-static")
+    ffprobe_version = execute_version(emulator, ffprobe, "ffprobe version 4.4.1-static")
+
+    environment["FFMPEG_BIN"] = str(ffmpeg.resolve())
+    environment["FFPROBE_BIN"] = str(ffprobe.resolve())
 
     command = [*prefix, str(server)]
     process = subprocess.Popen(
@@ -94,11 +124,12 @@ def smoke(runtime: Path, server: Path, emulator: Path, sysroot: Path) -> dict[st
     report = {
         "armRuntimeExecuted": True,
         "nodeVersion": version_output,
+        "ffmpegVersion": ffmpeg_version,
+        "ffprobeVersion": ffprobe_version,
         "serverPort": 11470,
         "httpStatus": status,
-        "ffmpegUsed": False,
-        "ffprobeUsed": False,
-        "scope": "startup only; no streaming or playback",
+        "mediaToolsExecuted": True,
+        "scope": "startup and version probes only; no streaming or playback",
         "logTail": decoded_output[-2000:],
     }
     print(json.dumps(report, indent=2, sort_keys=True))
@@ -109,10 +140,19 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--runtime", type=Path, required=True)
     parser.add_argument("--server", type=Path, required=True)
+    parser.add_argument("--ffmpeg", type=Path, required=True)
+    parser.add_argument("--ffprobe", type=Path, required=True)
     parser.add_argument("--emulator", type=Path, required=True)
     parser.add_argument("--sysroot", type=Path, required=True)
     args = parser.parse_args()
-    smoke(args.runtime, args.server, args.emulator, args.sysroot)
+    smoke(
+        args.runtime,
+        args.server,
+        args.ffmpeg,
+        args.ffprobe,
+        args.emulator,
+        args.sysroot,
+    )
 
 
 if __name__ == "__main__":
