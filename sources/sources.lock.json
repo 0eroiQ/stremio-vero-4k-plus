@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "status": "research",
+  "target": {
+    "product": "OSMC Vero 4K+",
+    "board_family": "vero3",
+    "soc_family": "Amlogic S905D"
+  },
+  "sources": [],
+  "unresolved": [
+    "Exact known-good OSMC kernel commit and matching configuration",
+    "Exact Vero 4K+ device tree, boot image layout, firmware, and userspace ABI",
+    "Permitted source or redistribution path for the official Stremio TV UI",
+    "Hardware-decoded playback path outside Kodi"
+  ]
+}
+
